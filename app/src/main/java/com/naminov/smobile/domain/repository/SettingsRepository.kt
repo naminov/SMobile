@@ -1,8 +1,8 @@
 package com.naminov.smobile.domain.repository
 
-import com.naminov.smobile.domain.model.SettingsConnection
+import com.naminov.smobile.domain.model.settings.Settings
 
 interface SettingsRepository {
-    fun getSettingsConnection(): SettingsConnection
-    fun setSettingsConnection(settingsConnection: SettingsConnection)
+    suspend fun getSettings(): Settings
+    suspend fun setSettings(settings: Settings)
 }

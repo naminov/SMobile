@@ -8,6 +8,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.R
 import com.naminov.smobile.app.App
@@ -81,6 +82,12 @@ class LoginFragment: Fragment() {
                 viewModel.event.emit(event)
             }
         }
+
+        if (savedInstanceState == null) {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.event.emit(UiEvent.OnLoad)
+            }
+        }
     }
 
     private fun handleState(state: UiState) {
@@ -88,10 +95,14 @@ class LoginFragment: Fragment() {
         binding.passwordEt.isEnabled = !state.loading
         binding.loginBtn.isEnabled = !state.loading && state.loginAvailable
 
-        binding.userNameEt.editText?.setText(state.userName)
-        binding.userNameEt.editText?.setSelection(state.userName.length)
-        binding.passwordEt.editText?.setText(state.password)
-        binding.passwordEt.editText?.setSelection(state.password.length)
+        binding.userNameEt.editText?.apply {
+            if (text.toString() == state.userName) return
+            setText(state.userName)
+        }
+        binding.passwordEt.editText?.apply {
+            if (text.toString() == state.password) return
+            setText(state.password)
+        }
     }
 
     private fun handleAction(action: UiAction) {
@@ -108,7 +119,11 @@ class LoginFragment: Fragment() {
     }
 
     private fun handleActionNavigateToSettings() {
-
+        findNavController()
+            .navigate(
+                LoginFragmentDirections
+                    .actionToSettings()
+            )
     }
 
     private fun handleActionShowMessage(action: UiAction.ShowMessage) {

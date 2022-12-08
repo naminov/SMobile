@@ -1,7 +1,7 @@
 package com.naminov.smobile.domain.usecase.authorization
 
-import com.naminov.smobile.domain.model.Authorization
+import com.naminov.smobile.domain.model.settings.Authorization
 
 interface GetAuthorizationUseCase {
-    operator fun invoke(): Authorization
+    suspend operator fun invoke(): Authorization
 }

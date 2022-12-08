@@ -1,7 +1,7 @@
 package com.naminov.smobile.di
 
-import com.naminov.smobile.data.dao.SettingsDao
-import com.naminov.smobile.data.dao.SettingsDaoImpl
+import com.naminov.smobile.data.db.Database
+import com.naminov.smobile.data.db.dao.SettingsDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -10,7 +10,9 @@ import javax.inject.Singleton
 class SettingsDaoModule {
     @Provides
     @Singleton
-    fun provideSettingsDao(): SettingsDao {
-        return SettingsDaoImpl()
+    fun provideSettingsDao(
+        database: Database
+    ): SettingsDao {
+        return database.SettingsDao()
     }
 }

@@ -1,4 +1,4 @@
-package com.naminov.smobile.domain.model
+package com.naminov.smobile.domain.model.settings
 
 data class Authorization(
     val userName: String,

@@ -1,13 +1,14 @@
 package com.naminov.smobile.domain.usecase.authorization
 
-import com.naminov.smobile.domain.model.Authorization
-import com.naminov.smobile.domain.repository.SettingsRepository
+import com.naminov.smobile.domain.model.settings.Authorization
+import com.naminov.smobile.domain.usecase.settings.GetSettingsUseCase
 
 class GetAuthorizationUseCaseImpl(
-    private val settingsRepository: SettingsRepository
+    private val getSettingsUseCase: GetSettingsUseCase
 ): GetAuthorizationUseCase {
-    override fun invoke(): Authorization {
-        val settingsConnection = settingsRepository.getSettingsConnection()
-        return settingsConnection.authorization
+    override suspend fun invoke(): Authorization {
+        val settings = getSettingsUseCase()
+        val connection = settings.connection
+        return connection.authorization
     }
 }

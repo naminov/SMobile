@@ -1,9 +1,11 @@
 package com.naminov.smobile.di
 
 import com.naminov.smobile.BuildConfig
-import com.naminov.smobile.data.api.BasicAuthorizationInterceptor
-import com.naminov.smobile.domain.repository.SettingsRepository
+import com.naminov.smobile.data.network.interceptor.AuthorizationInterceptor
+import com.naminov.smobile.data.network.interceptor.HostInterceptor
+import com.naminov.smobile.data.network.Constants
 import com.naminov.smobile.domain.usecase.authorization.GetAuthorizationUseCase
+import com.naminov.smobile.domain.usecase.connection.GetConnectionUseCase
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -26,34 +28,43 @@ class NetworkModule {
     }
 
     @Provides
-    fun provideBasicAuthorizationInterceptor(
+    fun provideHostInterceptor(
+        getConnectionUseCase: GetConnectionUseCase
+    ): HostInterceptor {
+        return HostInterceptor(
+            Constants.BASE_URL,
+            getConnectionUseCase
+        )
+    }
+
+    @Provides
+    fun provideAuthorizationInterceptor(
         getAuthorizationUseCase: GetAuthorizationUseCase
-    ): BasicAuthorizationInterceptor {
-        return BasicAuthorizationInterceptor(getAuthorizationUseCase)
+    ): AuthorizationInterceptor {
+        return AuthorizationInterceptor(getAuthorizationUseCase)
     }
 
     @Provides
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        basicAuthorizationInterceptor: BasicAuthorizationInterceptor
+        hostInterceptor: HostInterceptor,
+        authorizationInterceptor: AuthorizationInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(httpLoggingInterceptor)
-            .addInterceptor(basicAuthorizationInterceptor)
+            .addNetworkInterceptor(httpLoggingInterceptor)
+            .addInterceptor(hostInterceptor)
+            .addInterceptor(authorizationInterceptor)
             .build()
     }
 
     @Provides
     fun provideRetrofit(
-        okHttpClient: OkHttpClient,
-        settingsRepository: SettingsRepository
+        okHttpClient: OkHttpClient
     ): Retrofit {
-        val settingsConnection = settingsRepository.getSettingsConnection()
-
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
-            .baseUrl(settingsConnection.url)
+            .baseUrl(Constants.BASE_URL)
             .build()
     }
 }

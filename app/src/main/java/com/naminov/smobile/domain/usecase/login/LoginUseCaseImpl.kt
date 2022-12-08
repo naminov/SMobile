@@ -1,6 +1,6 @@
 package com.naminov.smobile.domain.usecase.login
 
-import com.naminov.smobile.domain.model.Authorization
+import com.naminov.smobile.domain.model.settings.Authorization
 import com.naminov.smobile.domain.repository.LoginRepository
 import com.naminov.smobile.domain.usecase.authorization.SaveAuthorizationUseCase
 

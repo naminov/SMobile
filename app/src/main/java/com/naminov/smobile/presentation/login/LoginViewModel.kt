@@ -3,13 +3,15 @@ package com.naminov.smobile.presentation.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naminov.smobile.R
-import com.naminov.smobile.domain.model.Authorization
+import com.naminov.smobile.domain.model.settings.Authorization
+import com.naminov.smobile.domain.usecase.authorization.GetAuthorizationUseCase
 import com.naminov.smobile.domain.usecase.login.LoginUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.Exception
 
 class LoginViewModel(
+    private val getAuthorizationUseCase: GetAuthorizationUseCase,
     private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
@@ -31,6 +33,7 @@ class LoginViewModel(
         when (uiEvent) {
             is UiEvent.OnUserNameChange -> handleEventOnUserNameChange(uiEvent)
             is UiEvent.OnPasswordChange -> handleEventOnPasswordChange(uiEvent)
+            UiEvent.OnLoad -> handleEventOnLoad()
             UiEvent.OnLoginClick -> handleEventOnLoginClick()
             UiEvent.OnSettingsClick -> handleEventOnSettingsClick()
         }
@@ -60,6 +63,23 @@ class LoginViewModel(
         }
     }
 
+    private fun handleEventOnLoad() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val authorization = getAuthorizationUseCase()
+                _state.value = _state.value.copy(
+                    userName = authorization.userName
+                )
+            } catch (e: Exception) {
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
+
+            _state.value = _state.value.copy(loading = false)
+        }
+    }
+
     private fun handleEventOnLoginClick() {
         viewModelScope.launch {
             _action.emit(UiAction.HideKeyboard)
@@ -71,7 +91,7 @@ class LoginViewModel(
                     _state.value.userName,
                     _state.value.password
                 )
-                loginUseCase.invoke(authorization)
+                loginUseCase(authorization)
 
                 _action.emit(UiAction.NavigateToOrderHistory)
             } catch (e: Exception) {

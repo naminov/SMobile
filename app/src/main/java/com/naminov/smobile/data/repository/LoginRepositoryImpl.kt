@@ -1,6 +1,6 @@
 package com.naminov.smobile.data.repository
 
-import com.naminov.smobile.data.api.LoginApi
+import com.naminov.smobile.data.network.api.LoginApi
 import com.naminov.smobile.domain.repository.LoginRepository
 
 class LoginRepositoryImpl(

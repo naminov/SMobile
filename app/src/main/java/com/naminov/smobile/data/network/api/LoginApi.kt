@@ -1,4 +1,4 @@
-package com.naminov.smobile.data.api
+package com.naminov.smobile.data.network.api
 
 import retrofit2.http.GET
 

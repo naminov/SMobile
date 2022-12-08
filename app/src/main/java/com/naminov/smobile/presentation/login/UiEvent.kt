@@ -9,6 +9,7 @@ sealed class UiEvent {
         val password: String
     ) : UiEvent()
 
+    object OnLoad : UiEvent()
     object OnLoginClick : UiEvent()
     object OnSettingsClick : UiEvent()
 }

@@ -1,8 +1,8 @@
 package com.naminov.smobile.di
 
-import com.naminov.smobile.domain.repository.SettingsRepository
 import com.naminov.smobile.domain.usecase.authorization.GetAuthorizationUseCase
 import com.naminov.smobile.domain.usecase.authorization.GetAuthorizationUseCaseImpl
+import com.naminov.smobile.domain.usecase.settings.GetSettingsUseCase
 import dagger.Module
 import dagger.Provides
 
@@ -10,8 +10,8 @@ import dagger.Provides
 class GetAuthorizationUseCaseModule {
     @Provides
     fun provideGetAuthorizationUseCase(
-        settingsRepository: SettingsRepository
+        getSettingsUseCase: GetSettingsUseCase
     ): GetAuthorizationUseCase {
-        return GetAuthorizationUseCaseImpl(settingsRepository)
+        return GetAuthorizationUseCaseImpl(getSettingsUseCase)
     }
 }

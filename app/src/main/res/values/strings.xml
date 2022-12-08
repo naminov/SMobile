@@ -4,6 +4,12 @@
     <string name="error">Ошибка</string>
     <!--endregion-->
 
+    <!--region settings_screen-->
+    <string name="settings_screen_title">Настройки</string>
+    <string name="settings_screen_connection_url">Адрес сервера</string>
+    <string name="settings_screen_save">Сохранить</string>
+    <!--endregion-->
+
     <!--region login_screen-->
     <string name="login_screen_title">Авторизация</string>
     <string name="login_screen_settings">Настройки</string>

@@ -1,15 +1,16 @@
-package com.naminov.smobile.data.api
+package com.naminov.smobile.data.network.interceptor
 
 import com.naminov.smobile.domain.usecase.authorization.GetAuthorizationUseCase
+import kotlinx.coroutines.runBlocking
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import java.nio.charset.StandardCharsets
 
-class BasicAuthorizationInterceptor(
+class AuthorizationInterceptor(
     private val getAuthorizationUseCase: GetAuthorizationUseCase
 ): Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
-        val authorization = getAuthorizationUseCase()
+        val authorization = runBlocking { getAuthorizationUseCase() }
 
         val credentials: String = Credentials.basic(
             authorization.userName,
