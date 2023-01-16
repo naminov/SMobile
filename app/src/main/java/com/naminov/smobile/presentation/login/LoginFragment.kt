@@ -115,7 +115,11 @@ class LoginFragment: Fragment() {
     }
 
     private fun handleActionNavigateToOrderHistory() {
-
+        findNavController()
+            .navigate(
+                LoginFragmentDirections
+                    .actionToOrderHistory()
+            )
     }
 
     private fun handleActionNavigateToSettings() {

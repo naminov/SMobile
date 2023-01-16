@@ -17,4 +17,14 @@
     <string name="login_screen_password">Пароль</string>
     <string name="login_screen_login">Войти</string>
     <!--endregion-->
+
+    <!--region order_history_screen-->
+    <string name="order_history_screen_title">История заказов</string>
+    <string name="order_history_screen_search">Поиск</string>
+    <string name="order_history_screen_settings">Настройки</string>
+    <string name="order_history_screen_filter_customer">Все покупатели</string>
+    <string name="order_history_screen_filter_no_documents">Нет документов</string>
+    <string name="order_history_screen_filter_no_payment">Нет оплаты</string>
+    <string name="order_history_screen_create">Создать</string>
+    <!--endregion-->
 </resources>

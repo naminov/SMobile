@@ -18,5 +18,19 @@
         <action
             android:id="@+id/action_to_settings"
             app:destination="@id/settings_fragment" />
+
+        <action
+            android:id="@+id/action_to_order_history"
+            app:destination="@id/order_history_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/order_history_fragment"
+        android:name="com.naminov.smobile.presentation.order.history.OrderHistoryFragment"
+        android:label="OrderHistoryFragment">
+
+        <action
+            android:id="@+id/action_to_settings"
+            app:destination="@id/settings_fragment" />
     </fragment>
 </navigation>
