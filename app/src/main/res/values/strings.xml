@@ -27,4 +27,9 @@
     <string name="order_history_screen_filter_no_payment">Нет оплаты</string>
     <string name="order_history_screen_create">Создать</string>
     <!--endregion-->
+
+    <!--region customers_screen-->
+    <string name="customers_screen_title">Покупатели</string>
+    <string name="customers_screen_search">Поиск</string>
+    <!--endregion-->
 </resources>

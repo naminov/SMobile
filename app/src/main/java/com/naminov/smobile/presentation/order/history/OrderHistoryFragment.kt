@@ -10,6 +10,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.clearFragmentResultListener
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,9 +21,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.R
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.OrderHistoryFragmentBinding
+import com.naminov.smobile.domain.model.Customer
 import com.naminov.smobile.domain.model.OrderHistory
 import com.naminov.smobile.presentation.adapter.OrderHistoryAdapter
-import com.naminov.smobile.presentation.extension.hideKeyboard
+import com.naminov.smobile.presentation.customer.CustomersFragment
 import com.naminov.smobile.presentation.glide.GlideApp
 import javax.inject.Inject
 import kotlin.math.abs
@@ -114,20 +117,22 @@ class OrderHistoryFragment: Fragment() {
         val searchItem = binding.appBar.menu
             .findItem(R.id.search)
 
+        val searchView = searchItem.actionView as SearchView
+
         val onScrollListener = object : RecyclerView.OnScrollListener() {
-            var isKeyboardHided = false
+            var isFocusCleared = false
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
                 when (newState) {
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        if (isKeyboardHided) return
-                        hideKeyboard()
-                        isKeyboardHided = true
+                        if (isFocusCleared) return
+                        searchView.clearFocus()
+                        isFocusCleared = true
                     }
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        isKeyboardHided = false
+                        isFocusCleared = false
                     }
                 }
             }
@@ -286,7 +291,6 @@ class OrderHistoryFragment: Fragment() {
             is UiAction.NavigateToSettings -> handleActionNavigateToSettings()
             is UiAction.NavigateToCustomers -> handleActionNavigateToCustomers()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
-            is UiAction.HideKeyboard -> handleActionHideKeyboard()
         }
     }
 
@@ -303,17 +307,27 @@ class OrderHistoryFragment: Fragment() {
     }
 
     private fun handleActionNavigateToCustomers() {
+        clearFragmentResultListener(CustomersFragment.REQUEST_KEY)
+        setFragmentResultListener(CustomersFragment.REQUEST_KEY) { _, bundle ->
+            bundle.getParcelable<Customer>((CustomersFragment.ARGUMENT_CUSTOMER))?.let { customer ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnFilterCustomerChange(customer))
+                }
+            }
+            clearFragmentResultListener(CustomersFragment.REQUEST_KEY)
+        }
 
+        findNavController()
+            .navigate(
+                OrderHistoryFragmentDirections
+                    .actionToCustomers()
+            )
     }
 
     private fun handleActionShowMessage(action: UiAction.ShowMessage) {
         Snackbar
             .make(binding.root, action.messageId, Snackbar.LENGTH_SHORT)
             .show()
-    }
-
-    private fun handleActionHideKeyboard() {
-        hideKeyboard()
     }
 
     override fun onDestroyView() {

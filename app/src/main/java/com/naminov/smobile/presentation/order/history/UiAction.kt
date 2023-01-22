@@ -12,7 +12,6 @@ sealed class UiAction {
         val order: OrderHistory
     ) : UiAction()
 
-    object HideKeyboard : UiAction()
     object NavigateToSettings : UiAction()
     object NavigateToCustomers : UiAction()
 }

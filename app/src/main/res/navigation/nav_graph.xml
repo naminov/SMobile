@@ -32,5 +32,15 @@
         <action
             android:id="@+id/action_to_settings"
             app:destination="@id/settings_fragment" />
+
+        <action
+            android:id="@+id/action_to_customers"
+            app:destination="@id/customers_fragment" />
     </fragment>
+
+    <dialog
+        android:id="@+id/customers_fragment"
+        android:name="com.naminov.smobile.presentation.customer.CustomersFragment"
+        android:label="CustomersFragment">
+    </dialog>
 </navigation>

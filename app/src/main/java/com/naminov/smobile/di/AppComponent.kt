@@ -1,5 +1,6 @@
 package com.naminov.smobile.di
 
+import com.naminov.smobile.presentation.customer.CustomersFragment
 import com.naminov.smobile.presentation.glide.GlideModule
 import com.naminov.smobile.presentation.login.LoginFragment
 import com.naminov.smobile.presentation.order.history.OrderHistoryFragment
@@ -18,6 +19,7 @@ import javax.inject.Singleton
         LoginRepositoryModule::class,
         OrdersApiModule::class,
         OrdersRepositoryModule::class,
+        CustomersApiModule::class,
         CustomersRepositoryModule::class,
         LoginUseCaseModule::class,
         GetSettingsUseCaseModule::class,
@@ -26,7 +28,8 @@ import javax.inject.Singleton
         GetAuthorizationUseCaseModule::class,
         SaveAuthorizationUseCaseModule::class,
         GetOrderHistoryUseCaseModule::class,
-        GetCustomerImgUseCaseModule::class
+        GetCustomerImgUseCaseModule::class,
+        GetCustomersUseCaseModule::class
     ]
 )
 @Singleton
@@ -35,4 +38,5 @@ interface AppComponent {
     fun inject(loginFragment: LoginFragment)
     fun inject(settingsFragment: SettingsFragment)
     fun inject(orderHistoryFragment: OrderHistoryFragment)
+    fun inject(customersFragment: CustomersFragment)
 }
