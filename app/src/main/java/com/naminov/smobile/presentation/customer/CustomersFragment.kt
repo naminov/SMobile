@@ -18,7 +18,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.CustomersFragmentBinding
-import com.naminov.smobile.domain.model.Customer
 import com.naminov.smobile.presentation.adapter.CustomersAdapter
 import javax.inject.Inject
 
@@ -122,13 +121,12 @@ class CustomersFragment: BottomSheetDialogFragment() {
         binding.customerRv.setHasFixedSize(true)
         binding.customerRv.adapter = customersAdapter
 
-        customersAdapter.onItemClickListener = object : CustomersAdapter.OnItemClickListener {
-            override fun onItemClick(customer: Customer) {
+        customersAdapter.onItemClickListener =
+            CustomersAdapter.OnItemClickListener { customer ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                     viewModel.event.emit(UiEvent.OnCustomerClick(customer))
                 }
             }
-        }
 
         val onScrollListener = object : RecyclerView.OnScrollListener() {
             var isFocusCleared = false

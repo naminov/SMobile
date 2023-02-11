@@ -59,7 +59,7 @@ class CustomersAdapter : RecyclerView.Adapter<CustomersAdapter.CustomerViewHolde
         }
     }
 
-    interface OnItemClickListener {
+    fun interface OnItemClickListener {
         fun onItemClick(customer: Customer)
     }
 }

@@ -32,4 +32,23 @@
     <string name="customers_screen_title">Покупатели</string>
     <string name="customers_screen_search">Поиск</string>
     <!--endregion-->
+
+    <!--region order_details_screen-->
+    <string name="order_details_screen_title">Детали заказа</string>
+    <string name="order_details_screen_number">Номер</string>
+    <string name="order_details_screen_date">Дата</string>
+    <string name="order_details_screen_customer">Покупатель</string>
+    <string name="order_details_screen_comment">Комментарий</string>
+    <string name="order_details_screen_sum">Итого</string>
+    <string name="order_details_screen_save">Сохранить</string>
+    <string name="order_details_screen_product">Товары</string>
+    <string name="order_details_screen_product_add">Добавить</string>
+    <string name="order_details_screen_product_number">Количество</string>
+    <string name="order_details_screen_product_price">Цена</string>
+    <string name="order_details_screen_product_sum">Сумма</string>
+    <string name="order_details_confirm_exit">Подтверждение выхода</string>
+    <string name="order_details_confirm_exit_negative">Отмена</string>
+    <string name="order_details_confirm_exit_positive">Выйти</string>
+    <string name="order_details_confirm_exit_without_save">Заказ был изменен. Выйти без сохранения?</string>
+    <!--endregion-->
 </resources>

@@ -55,14 +55,14 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
         }
 
         fun bind(order: OrderHistory) {
-            binding.idTv.text = order.id
+            binding.numberTv.text = order.number
             binding.dateTv.text = order.date
             binding.customerTv.text = order.customer
             binding.sumTv.text = order.sum
         }
     }
 
-    interface OnItemClickListener {
+    fun interface OnItemClickListener {
         fun onItemClick(order: OrderHistory)
     }
 }

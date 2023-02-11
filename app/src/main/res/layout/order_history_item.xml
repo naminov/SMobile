@@ -14,7 +14,7 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/id_tv"
+            android:id="@+id/number_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toStartOf="@id/sum_tv"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/id_tv"
+            app:layout_constraintTop_toBottomOf="@id/number_tv"
             app:layout_constraintVertical_bias="1"
             tools:text="ИП Чукаева Н.А." />
 

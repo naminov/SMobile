@@ -8,7 +8,7 @@ class GetOrderHistoryUseCaseImpl(
     private val ordersRepository: OrdersRepository
 ) : GetOrderHistoryUseCase {
     override suspend fun invoke(filter: OrderHistoryFilter): List<OrderHistory> {
-        val search = filter.search.ifEmpty { null }
+        val search = filter.search
         val customer = filter.customer?.id
         val payment = if (filter.noPayment) false else null
         val documents = if (filter.noDocuments) false else null

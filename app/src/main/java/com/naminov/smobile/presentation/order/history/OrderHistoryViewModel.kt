@@ -99,7 +99,7 @@ class OrderHistoryViewModel(
 
     private fun handleEventOnOrderClick(uiEvent: UiEvent.OnOrderClick) {
         viewModelScope.launch {
-            _action.emit(UiAction.NavigateToOrderDetails(uiEvent.order))
+            _action.emit(UiAction.NavigateToOrderDetails(uiEvent.order.id))
         }
     }
 
@@ -126,7 +126,10 @@ class OrderHistoryViewModel(
     }
 
     private fun handleEventOnCreateClick() {
-
+        viewModelScope.launch {
+            val customer = state.value.filter.customer?.id ?: ""
+            _action.emit(UiAction.NavigateToOrderCreate(customer))
+        }
     }
 
     private fun handleEventOnSettingsClick() {

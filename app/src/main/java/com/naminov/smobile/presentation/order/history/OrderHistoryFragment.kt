@@ -22,7 +22,6 @@ import com.naminov.smobile.R
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.OrderHistoryFragmentBinding
 import com.naminov.smobile.domain.model.Customer
-import com.naminov.smobile.domain.model.OrderHistory
 import com.naminov.smobile.presentation.adapter.OrderHistoryAdapter
 import com.naminov.smobile.presentation.customer.CustomersFragment
 import com.naminov.smobile.presentation.glide.GlideApp
@@ -229,13 +228,12 @@ class OrderHistoryFragment: Fragment() {
         binding.orderRv.setHasFixedSize(true)
         binding.orderRv.adapter = orderAdapter
 
-        orderAdapter.onItemClickListener = object : OrderHistoryAdapter.OnItemClickListener {
-            override fun onItemClick(order: OrderHistory) {
+        orderAdapter.onItemClickListener =
+            OrderHistoryAdapter.OnItemClickListener { order ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                     viewModel.event.emit(UiEvent.OnOrderClick(order))
                 }
             }
-        }
     }
 
     private fun initCreate() {
@@ -288,6 +286,7 @@ class OrderHistoryFragment: Fragment() {
     private fun handleAction(action: UiAction) {
         when (action) {
             is UiAction.NavigateToOrderDetails -> handleActionNavigateToOrderDetails(action)
+            is UiAction.NavigateToOrderCreate -> handleActionNavigateToOrderCreate(action)
             is UiAction.NavigateToSettings -> handleActionNavigateToSettings()
             is UiAction.NavigateToCustomers -> handleActionNavigateToCustomers()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
@@ -295,7 +294,25 @@ class OrderHistoryFragment: Fragment() {
     }
 
     private fun handleActionNavigateToOrderDetails(action: UiAction.NavigateToOrderDetails) {
+        findNavController()
+            .navigate(
+                OrderHistoryFragmentDirections
+                    .actionToOrderDetails(
+                        new = false,
+                        order = action.order
+                    )
+            )
+    }
 
+    private fun handleActionNavigateToOrderCreate(action: UiAction.NavigateToOrderCreate) {
+        findNavController()
+            .navigate(
+                OrderHistoryFragmentDirections
+                    .actionToOrderDetails(
+                        new = true,
+                        customer = action.customer
+                    )
+            )
     }
 
     private fun handleActionNavigateToSettings() {

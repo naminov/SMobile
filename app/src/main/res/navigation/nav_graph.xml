@@ -36,6 +36,10 @@
         <action
             android:id="@+id/action_to_customers"
             app:destination="@id/customers_fragment" />
+
+        <action
+            android:id="@+id/action_to_order_details"
+            app:destination="@id/order_details_fragment" />
     </fragment>
 
     <dialog
@@ -43,4 +47,33 @@
         android:name="com.naminov.smobile.presentation.customer.CustomersFragment"
         android:label="CustomersFragment">
     </dialog>
+
+    <fragment
+        android:id="@+id/order_details_fragment"
+        android:name="com.naminov.smobile.presentation.order.details.OrderDetailsFragment"
+        android:label="OrderDetailsFragment">
+
+        <argument
+            android:name="new"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
+        <argument
+            android:name="order"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="customer"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <action
+            android:id="@+id/action_to_settings"
+            app:destination="@id/settings_fragment" />
+
+        <action
+            android:id="@+id/action_to_customers"
+            app:destination="@id/customers_fragment" />
+    </fragment>
 </navigation>
