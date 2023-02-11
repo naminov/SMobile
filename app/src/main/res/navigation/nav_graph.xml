@@ -75,5 +75,15 @@
         <action
             android:id="@+id/action_to_customers"
             app:destination="@id/customers_fragment" />
+
+        <action
+            android:id="@+id/action_to_products"
+            app:destination="@id/products_fragment" />
     </fragment>
+
+    <dialog
+        android:id="@+id/products_fragment"
+        android:name="com.naminov.smobile.presentation.product.ProductsFragment"
+        android:label="ProductsFragment">
+    </dialog>
 </navigation>

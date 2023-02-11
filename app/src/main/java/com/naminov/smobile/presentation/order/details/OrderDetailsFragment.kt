@@ -22,9 +22,11 @@ import com.naminov.smobile.R
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.OrderDetailsFragmentBinding
 import com.naminov.smobile.domain.model.Customer
+import com.naminov.smobile.domain.model.Product
 import com.naminov.smobile.presentation.adapter.OrderDetailsProductsAdapter
 import com.naminov.smobile.presentation.customer.CustomersFragment
 import com.naminov.smobile.presentation.extension.hideKeyboard
+import com.naminov.smobile.presentation.product.ProductsFragment
 import javax.inject.Inject
 
 class OrderDetailsFragment : Fragment() {
@@ -253,7 +255,21 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun handleActionNavigateToProducts() {
+        clearFragmentResultListener(ProductsFragment.REQUEST_KEY)
+        setFragmentResultListener(ProductsFragment.REQUEST_KEY) { _, bundle ->
+            bundle.getParcelable<Product>((ProductsFragment.ARGUMENT_PRODUCT))?.let { product ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnProductAdd(product))
+                }
+            }
+            clearFragmentResultListener(ProductsFragment.REQUEST_KEY)
+        }
 
+        findNavController()
+            .navigate(
+                OrderDetailsFragmentDirections
+                    .actionToProducts()
+            )
     }
 
     private fun handleActionNavigateToSettings() {

@@ -5,6 +5,7 @@ import com.naminov.smobile.presentation.glide.GlideModule
 import com.naminov.smobile.presentation.login.LoginFragment
 import com.naminov.smobile.presentation.order.details.OrderDetailsFragment
 import com.naminov.smobile.presentation.order.history.OrderHistoryFragment
+import com.naminov.smobile.presentation.product.ProductsFragment
 import com.naminov.smobile.presentation.settings.SettingsFragment
 import dagger.Component
 import javax.inject.Singleton
@@ -22,6 +23,8 @@ import javax.inject.Singleton
         OrdersRepositoryModule::class,
         CustomersApiModule::class,
         CustomersRepositoryModule::class,
+        ProductsApiModule::class,
+        ProductsRepositoryModule::class,
         LoginUseCaseModule::class,
         GetSettingsUseCaseModule::class,
         SaveSettingsUseCaseModule::class,
@@ -40,7 +43,8 @@ import javax.inject.Singleton
         RemoveOrderProductUseCaseModule::class,
         HasOrderChangesUseCaseModule::class,
         SaveOrderUseCaseModule::class,
-        RemoveOrderUseCaseModule::class
+        RemoveOrderUseCaseModule::class,
+        GetProductsUseCaseModule::class
     ]
 )
 @Singleton
@@ -51,4 +55,5 @@ interface AppComponent {
     fun inject(orderHistoryFragment: OrderHistoryFragment)
     fun inject(customersFragment: CustomersFragment)
     fun inject(orderDetailsFragment: OrderDetailsFragment)
+    fun inject(productsFragment: ProductsFragment)
 }

@@ -51,4 +51,9 @@
     <string name="order_details_confirm_exit_positive">Выйти</string>
     <string name="order_details_confirm_exit_without_save">Заказ был изменен. Выйти без сохранения?</string>
     <!--endregion-->
+
+    <!--region products_screen-->
+    <string name="products_screen_title">Товары</string>
+    <string name="products_screen_search">Поиск</string>
+    <!--endregion-->
 </resources>
