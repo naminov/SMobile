@@ -223,10 +223,11 @@ class OrderHistoryFragment: Fragment() {
     }
 
     private fun initOrders() {
-        binding.orderRv.layoutManager =
-            LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
-        binding.orderRv.setHasFixedSize(true)
-        binding.orderRv.adapter = orderAdapter
+        binding.orderRv.apply {
+            layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
+            setHasFixedSize(true)
+            adapter = orderAdapter
+        }
 
         orderAdapter.onItemClickListener =
             OrderHistoryAdapter.OnItemClickListener { order ->

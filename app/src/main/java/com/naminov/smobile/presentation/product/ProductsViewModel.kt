@@ -30,7 +30,7 @@ class ProductsViewModel(
             is UiEvent.OnProductClick -> handleEventOnProductClick(uiEvent)
             is UiEvent.OnSearchChange -> handleEventOnSearchChange(uiEvent)
             UiEvent.OnLoad -> handleEventOnLoad()
-            UiEvent.OnExitClick -> handleEventOnCancelClick()
+            UiEvent.OnExitClick -> handleEventOnExitClick()
         }
     }
 
@@ -61,13 +61,13 @@ class ProductsViewModel(
                 )
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-            _state.value = _state.value.copy(loading = false)
         }
     }
 
-    private fun handleEventOnCancelClick() {
+    private fun handleEventOnExitClick() {
         viewModelScope.launch {
             _action.emit(UiAction.Exit)
         }

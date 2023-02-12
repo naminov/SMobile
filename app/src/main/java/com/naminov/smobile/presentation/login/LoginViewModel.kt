@@ -74,16 +74,14 @@ class LoginViewModel(
                 )
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-            _state.value = _state.value.copy(loading = false)
         }
     }
 
     private fun handleEventOnLoginClick() {
         viewModelScope.launch {
-            _action.emit(UiAction.HideKeyboard)
-
             _state.value = _state.value.copy(loading = true)
 
             try {
@@ -96,9 +94,9 @@ class LoginViewModel(
                 _action.emit(UiAction.NavigateToOrderHistory)
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-            _state.value = _state.value.copy(loading = false)
         }
     }
 

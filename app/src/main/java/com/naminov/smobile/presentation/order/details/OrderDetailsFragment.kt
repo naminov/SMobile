@@ -134,7 +134,7 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun initComment() {
-        binding.commentEt.editText?.run {
+        binding.commentEt.editText?.apply {
             setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     isCursorVisible = false
@@ -160,7 +160,7 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun initProducts() {
-        with(binding.productsRv) {
+        binding.productsRv.apply {
             layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
             setHasFixedSize(true)
             adapter = productsAdapter
@@ -200,15 +200,15 @@ class OrderDetailsFragment : Fragment() {
 
     private fun handleState(state: UiState) {
         val orderDetails = state.orderDetails
-        with(binding) {
+        binding.run {
             refreshSrl.isRefreshing = state.loading
             numberEt.editText?.setText(orderDetails.number)
             dateEt.editText?.setText(orderDetails.date)
-            customerEt.editText?.run {
+            customerEt.editText?.apply {
                 isClickable = orderDetails.editable
                 setText(orderDetails.customer.name)
             }
-            commentEt.editText?.run {
+            commentEt.editText?.apply {
                 isFocusable = orderDetails.editable
                 isCursorVisible = orderDetails.editable
                 setTextIsSelectable(orderDetails.editable)

@@ -32,7 +32,7 @@ class SettingsViewModel(
             is UiEvent.OnConnectionUrlChange -> handleEventOnConnectionUrlChange(uiEvent)
             UiEvent.OnLoad -> handleEventOnLoad()
             UiEvent.OnSaveClick -> handleEventOnSaveClick()
-            UiEvent.OnCancelClick -> handleEventOnCancelClick()
+            UiEvent.OnExitClick -> handleEventOnExitClick()
         }
     }
 
@@ -58,9 +58,9 @@ class SettingsViewModel(
                 )
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-           _state.value = _state.value.copy(loading = false)
         }
     }
 
@@ -77,18 +77,18 @@ class SettingsViewModel(
                 )
                 saveSettingsUseCase(settingsNew)
 
-                _action.emit(UiAction.Close)
+                _action.emit(UiAction.Exit)
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-            _state.value = _state.value.copy(loading = false)
         }
     }
 
-    private fun handleEventOnCancelClick() {
+    private fun handleEventOnExitClick() {
         viewModelScope.launch {
-            _action.emit(UiAction.Close)
+            _action.emit(UiAction.Exit)
         }
     }
 }

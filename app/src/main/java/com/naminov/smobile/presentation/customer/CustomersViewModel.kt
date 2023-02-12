@@ -30,14 +30,14 @@ class CustomersViewModel(
             is UiEvent.OnCustomerClick -> handleEventOnCustomerClick(uiEvent)
             is UiEvent.OnSearchChange -> handleEventOnSearchChange(uiEvent)
             UiEvent.OnLoad -> handleEventOnLoad()
-            UiEvent.OnCancelClick -> handleEventOnCancelClick()
+            UiEvent.OnExitClick -> handleEventOnExitClick()
         }
     }
 
     private fun handleEventOnCustomerClick(uiEvent: UiEvent.OnCustomerClick) {
         viewModelScope.launch {
             _action.emit(UiAction.SetResult(uiEvent.customer))
-            _action.emit(UiAction.Close)
+            _action.emit(UiAction.Exit)
         }
     }
 
@@ -61,15 +61,15 @@ class CustomersViewModel(
                 )
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-            _state.value = _state.value.copy(loading = false)
         }
     }
 
-    private fun handleEventOnCancelClick() {
+    private fun handleEventOnExitClick() {
         viewModelScope.launch {
-            _action.emit(UiAction.Close)
+            _action.emit(UiAction.Exit)
         }
     }
 }

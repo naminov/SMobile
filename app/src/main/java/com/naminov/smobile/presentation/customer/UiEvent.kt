@@ -12,5 +12,5 @@ sealed class UiEvent {
     ) : UiEvent()
 
     object OnLoad : UiEvent()
-    object OnCancelClick : UiEvent()
+    object OnExitClick : UiEvent()
 }

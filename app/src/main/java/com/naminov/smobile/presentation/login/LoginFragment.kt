@@ -43,6 +43,8 @@ class LoginFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViews()
+
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             viewModel.state.collect { handleState(it) }
         }
@@ -51,6 +53,24 @@ class LoginFragment: Fragment() {
             viewModel.action.collect { handleAction(it) }
         }
 
+        if (savedInstanceState == null) {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.event.emit(UiEvent.OnLoad)
+            }
+        }
+    }
+
+    private fun initViews() {
+        initAppBar()
+
+        initUserName()
+
+        initPassword()
+
+        initLogin()
+    }
+
+    private fun initAppBar() {
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.settings -> {
@@ -62,46 +82,54 @@ class LoginFragment: Fragment() {
                 else -> false
             }
         }
+    }
 
-        binding.loginBtn.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnLoginClick)
-            }
-        }
-
+    private fun initUserName() {
         binding.userNameEt.editText?.doOnTextChanged { text, _, _, _ ->
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 val event = UiEvent.OnUserNameChange(text.toString())
                 viewModel.event.emit(event)
             }
         }
+    }
 
+    private fun initPassword() {
         binding.passwordEt.editText?.doOnTextChanged { text, _, _, _ ->
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 val event = UiEvent.OnPasswordChange(text.toString())
                 viewModel.event.emit(event)
             }
         }
+    }
 
-        if (savedInstanceState == null) {
+    private fun initLogin() {
+        binding.loginBtn.setOnClickListener {
+            hideKeyboard()
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnLoad)
+                viewModel.event.emit(UiEvent.OnLoginClick)
             }
         }
     }
 
     private fun handleState(state: UiState) {
-        binding.userNameEt.isEnabled = !state.loading
-        binding.passwordEt.isEnabled = !state.loading
-        binding.loginBtn.isEnabled = !state.loading && state.loginAvailable
-
-        binding.userNameEt.editText?.apply {
-            if (text.toString() == state.userName) return
-            setText(state.userName)
-        }
-        binding.passwordEt.editText?.apply {
-            if (text.toString() == state.password) return
-            setText(state.password)
+        binding.run {
+            userNameEt.apply {
+                isEnabled = !state.loading
+                editText?.apply {
+                    if (text.toString() != state.userName) {
+                        setText(state.userName)
+                    }
+                }
+            }
+            passwordEt.apply {
+                isEnabled = !state.loading
+                editText?.apply {
+                    if (text.toString() != state.password) {
+                        setText(state.password)
+                    }
+                }
+            }
+            loginBtn.isEnabled = !state.loading && state.loginAvailable
         }
     }
 
@@ -110,7 +138,6 @@ class LoginFragment: Fragment() {
             UiAction.NavigateToOrderHistory -> handleActionNavigateToOrderHistory()
             UiAction.NavigateToSettings -> handleActionNavigateToSettings()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
-            is UiAction.HideKeyboard -> handleActionHideKeyboard()
         }
     }
 
@@ -134,10 +161,6 @@ class LoginFragment: Fragment() {
         Snackbar
             .make(binding.root, action.messageId, Snackbar.LENGTH_SHORT)
             .show()
-    }
-
-    private fun handleActionHideKeyboard() {
-        hideKeyboard()
     }
 
     override fun onDestroyView() {

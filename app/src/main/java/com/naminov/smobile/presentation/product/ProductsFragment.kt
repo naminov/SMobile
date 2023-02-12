@@ -83,7 +83,7 @@ class ProductsFragment : BottomSheetDialogFragment() {
 
     private fun initDialog() {
         val behavior = (dialog as BottomSheetDialog).behavior
-        with(behavior) {
+        behavior.apply {
             isFitToContents = false
             skipCollapsed = true
             expandedOffset = 64
@@ -125,7 +125,7 @@ class ProductsFragment : BottomSheetDialogFragment() {
     }
 
     private fun initProducts() {
-        with(binding.productRv) {
+        binding.productRv.apply {
             layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
             setHasFixedSize(true)
             adapter = productsAdapter

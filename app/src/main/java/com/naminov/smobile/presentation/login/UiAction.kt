@@ -7,7 +7,6 @@ sealed class UiAction {
         @StringRes val messageId: Int
     ) : UiAction()
 
-    object HideKeyboard: UiAction()
     object NavigateToSettings: UiAction()
     object NavigateToOrderHistory: UiAction()
 }

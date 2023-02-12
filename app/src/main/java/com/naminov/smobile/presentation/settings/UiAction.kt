@@ -7,5 +7,5 @@ sealed class UiAction {
         @StringRes val messageId: Int
     ) : UiAction()
 
-    object Close : UiAction()
+    object Exit : UiAction()
 }

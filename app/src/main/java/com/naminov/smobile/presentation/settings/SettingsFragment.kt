@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -41,6 +42,8 @@ class SettingsFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViews()
+
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             viewModel.state.collect { handleState(it) }
         }
@@ -49,22 +52,9 @@ class SettingsFragment: Fragment() {
             viewModel.action.collect { handleAction(it) }
         }
 
-        binding.appBar.setNavigationOnClickListener {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnCancelClick)
-            }
-        }
-
-        binding.saveBtn.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnSaveClick)
-            }
-        }
-
-        binding.connectionUrlEt.editText?.doOnTextChanged { text, _, _, _ ->
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                val event = UiEvent.OnConnectionUrlChange(text.toString())
-                viewModel.event.emit(event)
+                viewModel.event.emit(UiEvent.OnExitClick)
             }
         }
 
@@ -75,24 +65,61 @@ class SettingsFragment: Fragment() {
         }
     }
 
-    private fun handleState(state: UiState) {
-        binding.connectionUrlEt.isEnabled = !state.loading
-        binding.saveBtn.isEnabled = !state.loading
+    private fun initViews() {
+        initAppBar()
 
-        binding.connectionUrlEt.editText?.apply {
-            if (text.toString() == state.connectionUrl) return
-            setText(state.connectionUrl)
+        initConnectionUrl()
+
+        initSave()
+    }
+
+    private fun initAppBar() {
+        binding.appBar.setNavigationOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.event.emit(UiEvent.OnExitClick)
+            }
+        }
+    }
+
+    private fun initConnectionUrl() {
+        binding.connectionUrlEt.editText?.doOnTextChanged { text, _, _, _ ->
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                val event = UiEvent.OnConnectionUrlChange(text.toString())
+                viewModel.event.emit(event)
+            }
+        }
+    }
+
+    private fun initSave() {
+        binding.saveBtn.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.event.emit(UiEvent.OnSaveClick)
+            }
+        }
+    }
+
+    private fun handleState(state: UiState) {
+        binding.run {
+            connectionUrlEt.apply {
+                isEnabled = !state.loading
+                editText?.apply {
+                    if (text.toString() != state.connectionUrl) {
+                        setText(state.connectionUrl)
+                    }
+                }
+            }
+            saveBtn.isEnabled = !state.loading
         }
     }
 
     private fun handleAction(action: UiAction) {
         when (action) {
-            UiAction.Close -> handleActionClose()
+            UiAction.Exit -> handleActionExit()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
         }
     }
 
-    private fun handleActionClose() {
+    private fun handleActionExit() {
         findNavController()
             .navigateUp()
     }

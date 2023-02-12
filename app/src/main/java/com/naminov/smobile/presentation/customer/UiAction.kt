@@ -12,5 +12,5 @@ sealed class UiAction {
         val customer: Customer
     ) : UiAction()
 
-    object Close : UiAction()
+    object Exit : UiAction()
 }

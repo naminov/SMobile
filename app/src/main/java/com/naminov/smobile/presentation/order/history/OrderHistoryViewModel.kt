@@ -115,9 +115,9 @@ class OrderHistoryViewModel(
                 )
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
             }
-
-            _state.value = _state.value.copy(loading = false)
         }
     }
 

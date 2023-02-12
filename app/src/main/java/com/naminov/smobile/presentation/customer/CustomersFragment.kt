@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
@@ -67,6 +68,12 @@ class CustomersFragment: BottomSheetDialogFragment() {
             viewModel.action.collect { handleAction(it) }
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.event.emit(UiEvent.OnExitClick)
+            }
+        }
+
         if (savedInstanceState == null) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnLoad)
@@ -76,10 +83,12 @@ class CustomersFragment: BottomSheetDialogFragment() {
 
     private fun initDialog() {
         val behavior = (dialog as BottomSheetDialog).behavior
-        behavior.isFitToContents = false
-        behavior.skipCollapsed = true
-        behavior.expandedOffset = 64
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.apply {
+            isFitToContents = false
+            skipCollapsed = true
+            expandedOffset = 64
+            state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     private fun initViews() {
@@ -95,7 +104,7 @@ class CustomersFragment: BottomSheetDialogFragment() {
     private fun initAppBar() {
         binding.appBar.setNavigationOnClickListener {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnCancelClick)
+                viewModel.event.emit(UiEvent.OnExitClick)
             }
         }
     }
@@ -116,10 +125,11 @@ class CustomersFragment: BottomSheetDialogFragment() {
     }
 
     private fun initCustomers() {
-        binding.customerRv.layoutManager =
-            LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
-        binding.customerRv.setHasFixedSize(true)
-        binding.customerRv.adapter = customersAdapter
+        binding.customerRv.apply {
+            layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
+            setHasFixedSize(true)
+            adapter = customersAdapter
+        }
 
         customersAdapter.onItemClickListener =
             CustomersAdapter.OnItemClickListener { customer ->
@@ -157,13 +167,13 @@ class CustomersFragment: BottomSheetDialogFragment() {
 
     private fun handleAction(action: UiAction) {
         when (action) {
-            is UiAction.Close ->  handleActionClose()
+            is UiAction.Exit -> handleActionExit()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
             is UiAction.SetResult -> handleActionSetResult(action)
         }
     }
 
-    private fun handleActionClose() {
+    private fun handleActionExit() {
         findNavController()
             .navigateUp()
     }

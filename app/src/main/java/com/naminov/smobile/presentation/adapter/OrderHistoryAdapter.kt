@@ -55,10 +55,12 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
         }
 
         fun bind(order: OrderHistory) {
-            binding.numberTv.text = order.number
-            binding.dateTv.text = order.date
-            binding.customerTv.text = order.customer
-            binding.sumTv.text = order.sum
+            binding.run {
+                numberTv.text = order.number
+                dateTv.text = order.date
+                customerTv.text = order.customer
+                sumTv.text = order.sum
+            }
         }
     }
 

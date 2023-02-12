@@ -7,5 +7,5 @@ sealed class UiEvent {
 
     object OnLoad : UiEvent()
     object OnSaveClick : UiEvent()
-    object OnCancelClick : UiEvent()
+    object OnExitClick : UiEvent()
 }

@@ -56,65 +56,63 @@ class OrderDetailsProductsAdapter :
         }
 
         private fun setListeners() {
-            with(binding) {
-                numberEt.editText?.run {
-                    setOnFocusChangeListener { _, hasFocus ->
-                        if (hasFocus) {
-                            isCursorVisible = false
-                            post {
-                                isCursorVisible = true
-                                setSelection(text.length)
-                            }
+            binding.numberEt.editText?.apply {
+                setOnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) {
+                        isCursorVisible = false
+                        post {
+                            isCursorVisible = true
+                            setSelection(text.length)
+                        }
+                    } else {
+                        if (adapterPosition == RecyclerView.NO_POSITION) {
+                            return@setOnFocusChangeListener
+                        }
+                        val product = items[adapterPosition]
+                        val number = if (text.isNotEmpty()) {
+                            text.toString().toInt()
                         } else {
-                            if (adapterPosition == RecyclerView.NO_POSITION) {
-                                return@setOnFocusChangeListener
-                            }
-                            val product = items[adapterPosition]
-                            val number = if (text.isNotEmpty()) {
-                                text.toString().toInt()
-                            } else {
-                                0
-                            }
-                            onProductNumberChangeListener?.onProductNumberChange(product, number)
+                            0
                         }
-                    }
-
-                    doOnTextChanged { text, _, _, _ ->
-                        if (text.isNullOrEmpty()) {
-                            return@doOnTextChanged
-                        }
-                        val textOld = text.toString()
-                        val textNew = textOld.toInt().toString()
-                        if (textOld == textNew) {
-                            return@doOnTextChanged
-                        }
-                        setText(textNew)
-                        setSelection(textNew.length)
-                    }
-
-                    setOnEditorActionListener { _, actionId, _ ->
-                        if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            clearFocus()
-                        }
-                        return@setOnEditorActionListener false
+                        onProductNumberChangeListener?.onProductNumberChange(product, number)
                     }
                 }
 
-                removeBtn.setOnClickListener {
-                    if (adapterPosition == RecyclerView.NO_POSITION) {
-                        return@setOnClickListener
+                doOnTextChanged { text, _, _, _ ->
+                    if (text.isNullOrEmpty()) {
+                        return@doOnTextChanged
                     }
-                    val product = items[adapterPosition]
-                    onProductRemoveListener?.onProductRemove(product)
+                    val textOld = text.toString()
+                    val textNew = textOld.toInt().toString()
+                    if (textOld == textNew) {
+                        return@doOnTextChanged
+                    }
+                    setText(textNew)
+                    setSelection(textNew.length)
                 }
+
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        clearFocus()
+                    }
+                    return@setOnEditorActionListener false
+                }
+            }
+
+            binding.removeBtn.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
+                val product = items[adapterPosition]
+                onProductRemoveListener?.onProductRemove(product)
             }
         }
 
         fun bind(orderDetailsProduct: OrderDetailsProduct) {
-            with(binding) {
+            binding.run {
                 removeBtn.isVisible = editable
                 nameEt.editText?.setText(orderDetailsProduct.product.name)
-                numberEt.editText?.run {
+                numberEt.editText?.apply {
                     isFocusable = editable
                     isCursorVisible = editable
                     setTextIsSelectable(editable)
