@@ -17,6 +17,7 @@ sealed class UiAction {
     ) : UiAction()
 
     class NavigateToOrderCreate(
+        val order: String,
         val customer: String
     ) : UiAction()
 

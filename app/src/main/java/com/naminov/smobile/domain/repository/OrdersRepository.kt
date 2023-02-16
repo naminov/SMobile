@@ -15,7 +15,7 @@ interface OrdersRepository {
     suspend fun editOrder(id: String, orderEdit: OrderEdit): OrderDetails
     suspend fun saveOrder(id: String, orderEdit: OrderEdit): OrderDetails
     suspend fun removeOrder(id: String)
-    suspend fun getOrderDetailsNew(customer: String?): OrderDetails
+    suspend fun getOrderDetailsNew(id: String?, customer: String?): OrderDetails
     suspend fun editOrderNew(orderEdit: OrderEdit): OrderDetails
     suspend fun saveOrderNew(orderEdit: OrderEdit): OrderDetails
 }

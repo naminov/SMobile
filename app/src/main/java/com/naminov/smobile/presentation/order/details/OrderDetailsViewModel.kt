@@ -45,6 +45,8 @@ class OrderDetailsViewModel(
             UiEvent.OnCustomerClick -> handleEventOnCustomerClick()
             UiEvent.OnProductAddClick -> handleEventOnProductAddClick()
             UiEvent.OnSaveClick -> handleEventOnSaveClick()
+            UiEvent.OnCopyClick -> handleEventOnCopyClick()
+            UiEvent.OnCopyConfirm -> handleEventOnCopyConfirm()
             UiEvent.OnRemoveClick -> handleEventOnRemoveClick()
             UiEvent.OnRemoveConfirm -> handleEventOnRemoveConfirm()
             UiEvent.OnSettingsClick -> handleEventOnSettingsClick()
@@ -165,7 +167,7 @@ class OrderDetailsViewModel(
 
             try {
                 val orderDetails = if (uiEvent.new) {
-                    getOrderDetailsNewUseCase(uiEvent.customer)
+                    getOrderDetailsNewUseCase(uiEvent.order, uiEvent.customer)
                 } else {
                     getOrderDetailsUseCase(uiEvent.order)
                 }
@@ -214,6 +216,60 @@ class OrderDetailsViewModel(
             }
 
             _action.emit(UiAction.Exit)
+        }
+    }
+
+    private fun handleEventOnCopyClick() {
+        viewModelScope.launch {
+            val hasChanges = hasOrderChangesUseCase(
+                state.value.orderDetailsOrig,
+                state.value.orderDetails
+            )
+
+            if (hasChanges) {
+                _action.emit(UiAction.CopyConfirm)
+                return@launch
+            }
+
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val orderDetails = getOrderDetailsNewUseCase(
+                    _state.value.orderDetails.id,
+                    ""
+                )
+
+                _state.value = _state.value.copy(
+                    orderDetailsOrig = orderDetails,
+                    orderDetails = orderDetails
+                )
+            } catch (e: Exception) {
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
+            }
+        }
+    }
+
+    private fun handleEventOnCopyConfirm() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val orderDetails = getOrderDetailsNewUseCase(
+                    _state.value.orderDetails.id,
+                    ""
+                )
+
+                _state.value = _state.value.copy(
+                    orderDetailsOrig = orderDetails,
+                    orderDetails = orderDetails
+                )
+            } catch (e: Exception) {
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
+            }
         }
     }
 

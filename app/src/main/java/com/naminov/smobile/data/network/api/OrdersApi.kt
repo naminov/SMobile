@@ -38,6 +38,7 @@ interface OrdersApi {
 
     @GET("/orders/new")
     suspend fun getOrderDetailsNew(
+        @Query("id") id: String?,
         @Query("customer") customer: String?
     ): OrderDetailsDto
 

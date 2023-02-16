@@ -10,6 +10,7 @@ sealed class UiAction {
     object NavigateToCustomers : UiAction()
     object NavigateToProducts : UiAction()
     object NavigateToSettings : UiAction()
+    object CopyConfirm : UiAction()
     object RemoveConfirm : UiAction()
     object ExitConfirmWithoutSave : UiAction()
     object Exit : UiAction()

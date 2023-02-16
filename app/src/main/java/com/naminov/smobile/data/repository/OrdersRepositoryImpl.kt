@@ -45,9 +45,9 @@ class OrdersRepositoryImpl(
             .removeOrder(id)
     }
 
-    override suspend fun getOrderDetailsNew(customer: String?): OrderDetails {
+    override suspend fun getOrderDetailsNew(id: String?, customer: String?): OrderDetails {
         return ordersApi
-            .getOrderDetailsNew(customer?.ifEmpty { null })
+            .getOrderDetailsNew(id?.ifEmpty { null }, customer?.ifEmpty { null })
             .toDomain()
     }
 

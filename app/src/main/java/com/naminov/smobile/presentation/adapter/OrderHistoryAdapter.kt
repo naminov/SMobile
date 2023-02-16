@@ -13,6 +13,7 @@ import com.naminov.smobile.domain.model.OrderHistory
 
 class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder>() {
     var onItemClickListener: OnItemClickListener? = null
+    var onCopyClickListener: OnCopyClickListener? = null
     var onRemoveClickListener: OnRemoveClickListener? = null
 
     var items: List<OrderHistory> = listOf()
@@ -68,6 +69,7 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
                 popup.menuInflater.inflate(R.menu.order_history_more, popup.menu)
                 popup.setOnMenuItemClickListener { menuItem: MenuItem ->
                     when (menuItem.itemId) {
+                        R.id.copy -> onCopyClickListener?.onCopyClick(item)
                         R.id.remove -> onRemoveClickListener?.onRemoveClick(item)
                     }
                     return@setOnMenuItemClickListener true
@@ -91,6 +93,10 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
 
     fun interface OnItemClickListener {
         fun onItemClick(order: OrderHistory)
+    }
+
+    fun interface OnCopyClickListener {
+        fun onCopyClick(order: OrderHistory)
     }
 
     fun interface OnRemoveClickListener {

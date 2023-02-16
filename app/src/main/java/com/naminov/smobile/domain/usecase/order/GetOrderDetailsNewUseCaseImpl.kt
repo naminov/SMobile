@@ -6,7 +6,7 @@ import com.naminov.smobile.domain.repository.OrdersRepository
 class GetOrderDetailsNewUseCaseImpl(
     private val ordersRepository: OrdersRepository
 ) : GetOrderDetailsNewUseCase {
-    override suspend fun invoke(customer: String?): OrderDetails {
-        return ordersRepository.getOrderDetailsNew(customer)
+    override suspend fun invoke(id: String?, customer: String?): OrderDetails {
+        return ordersRepository.getOrderDetailsNew(id, customer)
     }
 }

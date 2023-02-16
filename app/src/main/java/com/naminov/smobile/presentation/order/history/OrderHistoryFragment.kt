@@ -237,6 +237,13 @@ class OrderHistoryFragment: Fragment() {
                 }
             }
 
+        orderAdapter.onCopyClickListener =
+            OrderHistoryAdapter.OnCopyClickListener { order ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnOrderCopyClick(order))
+                }
+            }
+
         orderAdapter.onRemoveClickListener =
             OrderHistoryAdapter.OnRemoveClickListener { order ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -333,6 +340,7 @@ class OrderHistoryFragment: Fragment() {
                 OrderHistoryFragmentDirections
                     .actionToOrderDetails(
                         new = true,
+                        order = action.order,
                         customer = action.customer
                     )
             )

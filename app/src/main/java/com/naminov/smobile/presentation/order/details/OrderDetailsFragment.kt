@@ -113,6 +113,12 @@ class OrderDetailsFragment : Fragment() {
 
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.copy -> {
+                    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                        viewModel.event.emit(UiEvent.OnCopyClick)
+                    }
+                    true
+                }
                 R.id.remove -> {
                     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                         viewModel.event.emit(UiEvent.OnRemoveClick)
@@ -226,6 +232,9 @@ class OrderDetailsFragment : Fragment() {
             sumEt.editText?.setText(orderDetails.sum)
             productsAddBtn.isVisible = orderDetails.editable
             saveFab.isVisible = orderDetails.editable
+            val copyItem = appBar.menu
+                .findItem(R.id.copy)
+            copyItem?.isVisible = !orderDetails.new
             val removeItem = appBar.menu
                 .findItem(R.id.remove)
             removeItem?.isVisible = !orderDetails.new
@@ -240,6 +249,7 @@ class OrderDetailsFragment : Fragment() {
             UiAction.NavigateToProducts -> handleActionNavigateToProducts()
             UiAction.NavigateToSettings -> handleActionNavigateToSettings()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
+            UiAction.CopyConfirm -> handleActionCopyConfirm()
             UiAction.RemoveConfirm -> handleActionRemoveConfirm()
             UiAction.ExitConfirmWithoutSave -> handleActionExitConfirmWithoutSave()
             UiAction.Exit -> handleActionExit()
@@ -293,6 +303,19 @@ class OrderDetailsFragment : Fragment() {
     private fun handleActionShowMessage(action: UiAction.ShowMessage) {
         Snackbar
             .make(binding.root, action.messageId, Snackbar.LENGTH_SHORT)
+            .show()
+    }
+
+    private fun handleActionCopyConfirm() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.order_details_screen_copy_confirm_title))
+            .setMessage(getString(R.string.order_details_screen_copy_confirm_without_save))
+            .setNegativeButton(getString(R.string.order_details_screen_copy_confirm_negative), null)
+            .setPositiveButton(getString(R.string.order_details_screen_copy_confirm_positive)) { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnCopyConfirm)
+                }
+            }
             .show()
     }
 

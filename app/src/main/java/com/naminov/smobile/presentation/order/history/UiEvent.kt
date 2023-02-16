@@ -24,6 +24,10 @@ sealed class UiEvent {
         val order: OrderHistory
     ) : UiEvent()
 
+    class OnOrderCopyClick(
+        val order: OrderHistory
+    ) : UiEvent()
+
     class OnOrderRemoveClick(
         val order: OrderHistory
     ) : UiEvent()

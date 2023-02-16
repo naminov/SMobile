@@ -25,6 +25,7 @@
     <string name="order_history_screen_filter_customer">Все покупатели</string>
     <string name="order_history_screen_filter_no_documents">Нет документов</string>
     <string name="order_history_screen_filter_no_payment">Нет оплаты</string>
+    <string name="order_history_screen_copy">Скопировать</string>
     <string name="order_history_screen_remove">Удалить</string>
     <string name="order_history_screen_remove_confirm_title">Подтверждение удаления</string>
     <string name="order_history_screen_remove_confirm_negative">Отмена</string>
@@ -40,6 +41,7 @@
 
     <!--region order_details_screen-->
     <string name="order_details_screen_title">Детали заказа</string>
+    <string name="order_details_screen_settings">Настройки</string>
     <string name="order_details_screen_number">Номер</string>
     <string name="order_details_screen_date">Дата</string>
     <string name="order_details_screen_customer">Покупатель</string>
@@ -51,6 +53,12 @@
     <string name="order_details_screen_product_number">Количество</string>
     <string name="order_details_screen_product_price">Цена</string>
     <string name="order_details_screen_product_sum">Сумма</string>
+    <string name="order_details_screen_copy">Скопировать</string>
+    <string name="order_details_screen_copy_confirm_title">Подтверждение копирования</string>
+    <string name="order_details_screen_copy_confirm_negative">Отмена</string>
+    <string name="order_details_screen_copy_confirm_positive">Скопировать</string>
+    <string name="order_details_screen_copy_confirm_without_save">Заказ был изменен. Скопировать без сохранения?</string>
+    <string name="order_details_screen_remove">Удалить</string>
     <string name="order_details_screen_remove_confirm_title">Подтверждение удаления</string>
     <string name="order_details_screen_remove_confirm_negative">Отмена</string>
     <string name="order_details_screen_remove_confirm_positive">Удалить</string>

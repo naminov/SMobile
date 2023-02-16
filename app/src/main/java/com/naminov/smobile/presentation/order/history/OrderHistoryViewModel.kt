@@ -36,6 +36,7 @@ class OrderHistoryViewModel(
             is UiEvent.OnFilterNoDocumentsChange -> handleEventOnFilterNoDocumentsChange(uiEvent)
             is UiEvent.OnFilterNoPaymentChange -> handleEventOnFilterNoPaymentChange(uiEvent)
             is UiEvent.OnOrderClick -> handleEventOnOrderClick(uiEvent)
+            is UiEvent.OnOrderCopyClick -> handleEventOnOrderCopyClick(uiEvent)
             is UiEvent.OnOrderRemoveClick -> handleEventOnOrderRemoveClick(uiEvent)
             is UiEvent.OnOrderRemoveConfirm -> handleEventOnOrderRemoveConfirm(uiEvent)
             UiEvent.OnLoad -> handleEventOnLoad()
@@ -107,6 +108,13 @@ class OrderHistoryViewModel(
         }
     }
 
+    private fun handleEventOnOrderCopyClick(uiEvent: UiEvent.OnOrderCopyClick) {
+        viewModelScope.launch {
+            val order = uiEvent.order.id
+            _action.emit(UiAction.NavigateToOrderCreate(order, ""))
+        }
+    }
+
     private fun handleEventOnOrderRemoveClick(uiEvent: UiEvent.OnOrderRemoveClick) {
         viewModelScope.launch {
             _action.emit(UiAction.OrderRemoveConfirm(uiEvent.order))
@@ -153,7 +161,7 @@ class OrderHistoryViewModel(
     private fun handleEventOnCreateClick() {
         viewModelScope.launch {
             val customer = state.value.filter.customer?.id ?: ""
-            _action.emit(UiAction.NavigateToOrderCreate(customer))
+            _action.emit(UiAction.NavigateToOrderCreate("", customer))
         }
     }
 
