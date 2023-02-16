@@ -1,14 +1,19 @@
 package com.naminov.smobile.presentation.adapter
 
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.naminov.smobile.R
 import com.naminov.smobile.databinding.OrderHistoryItemBinding
 import com.naminov.smobile.domain.model.OrderHistory
 
 class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder>() {
     var onItemClickListener: OnItemClickListener? = null
+    var onRemoveClickListener: OnRemoveClickListener? = null
 
     var items: List<OrderHistory> = listOf()
         set(value) {
@@ -52,6 +57,23 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
                 val item = items[adapterPosition]
                 onItemClickListener?.onItemClick(item)
             }
+
+            binding.moreBtn.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION){
+                    return@setOnClickListener
+                }
+                val item = items[adapterPosition]
+
+                val popup = PopupMenu(it.context, it)
+                popup.menuInflater.inflate(R.menu.order_history_more, popup.menu)
+                popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                    when (menuItem.itemId) {
+                        R.id.remove -> onRemoveClickListener?.onRemoveClick(item)
+                    }
+                    return@setOnMenuItemClickListener true
+                }
+                popup.show()
+            }
         }
 
         fun bind(order: OrderHistory) {
@@ -60,11 +82,18 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
                 dateTv.text = order.date
                 customerTv.text = order.customer
                 sumTv.text = order.sum
+                completedIv.isInvisible = !order.completed
+                noPaymentIv.isInvisible = order.payment
+                noDocumentsIv.isInvisible = order.documents
             }
         }
     }
 
     fun interface OnItemClickListener {
         fun onItemClick(order: OrderHistory)
+    }
+
+    fun interface OnRemoveClickListener {
+        fun onRemoveClick(order: OrderHistory)
     }
 }

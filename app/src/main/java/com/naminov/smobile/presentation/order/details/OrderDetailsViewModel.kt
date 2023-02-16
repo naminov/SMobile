@@ -16,6 +16,7 @@ class OrderDetailsViewModel(
     private val addOrderProductUseCase: AddOrderProductUseCase,
     private val removeOrderProductUseCase: RemoveOrderProductUseCase,
     private val hasOrderChangesUseCase: HasOrderChangesUseCase,
+    private val removeOrderUseCase: RemoveOrderUseCase,
     private val saveOrderUseCase: SaveOrderUseCase
 ) : ViewModel() {
 
@@ -44,9 +45,11 @@ class OrderDetailsViewModel(
             UiEvent.OnCustomerClick -> handleEventOnCustomerClick()
             UiEvent.OnProductAddClick -> handleEventOnProductAddClick()
             UiEvent.OnSaveClick -> handleEventOnSaveClick()
+            UiEvent.OnRemoveClick -> handleEventOnRemoveClick()
+            UiEvent.OnRemoveConfirm -> handleEventOnRemoveConfirm()
             UiEvent.OnSettingsClick -> handleEventOnSettingsClick()
-            UiEvent.OnConfirmExitWithoutSave -> handleEventOnConfirmExitWithoutSave()
             UiEvent.OnExitClick -> handleEventOnExitClick()
+            UiEvent.OnExitConfirmWithoutSave -> handleEventOnExitConfirmWithoutSave()
         }
     }
 
@@ -214,15 +217,32 @@ class OrderDetailsViewModel(
         }
     }
 
-    private fun handleEventOnSettingsClick() {
+    private fun handleEventOnRemoveClick() {
         viewModelScope.launch {
-            _action.emit(UiAction.NavigateToSettings)
+            _action.emit(UiAction.RemoveConfirm)
         }
     }
 
-    private fun handleEventOnConfirmExitWithoutSave() {
+    private fun handleEventOnRemoveConfirm() {
         viewModelScope.launch {
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                removeOrderUseCase(_state.value.orderDetails.id)
+            } catch (e: Exception) {
+                _action.emit(UiAction.ShowMessage(R.string.error))
+                return@launch
+            } finally {
+                _state.value = _state.value.copy(loading = false)
+            }
+
             _action.emit(UiAction.Exit)
+        }
+    }
+
+    private fun handleEventOnSettingsClick() {
+        viewModelScope.launch {
+            _action.emit(UiAction.NavigateToSettings)
         }
     }
 
@@ -234,10 +254,16 @@ class OrderDetailsViewModel(
             )
 
             if (hasChanges) {
-                _action.emit(UiAction.ConfirmExitWithoutSave)
+                _action.emit(UiAction.ExitConfirmWithoutSave)
             } else {
                 _action.emit(UiAction.Exit)
             }
+        }
+    }
+
+    private fun handleEventOnExitConfirmWithoutSave() {
+        viewModelScope.launch {
+            _action.emit(UiAction.Exit)
         }
     }
 }

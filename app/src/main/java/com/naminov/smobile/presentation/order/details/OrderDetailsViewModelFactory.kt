@@ -14,6 +14,7 @@ class OrderDetailsViewModelFactory @Inject constructor(
     private val addOrderProductUseCase: AddOrderProductUseCase,
     private val removeOrderProductUseCase: RemoveOrderProductUseCase,
     private val hasOrderChangesUseCase: HasOrderChangesUseCase,
+    private val removeOrderUseCase: RemoveOrderUseCase,
     private val saveOrderUseCase: SaveOrderUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -26,6 +27,7 @@ class OrderDetailsViewModelFactory @Inject constructor(
             addOrderProductUseCase,
             removeOrderProductUseCase,
             hasOrderChangesUseCase,
+            removeOrderUseCase,
             saveOrderUseCase
         ) as T
     }

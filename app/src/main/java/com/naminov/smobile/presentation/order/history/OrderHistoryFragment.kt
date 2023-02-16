@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.R
 import com.naminov.smobile.app.App
@@ -235,6 +236,13 @@ class OrderHistoryFragment: Fragment() {
                     viewModel.event.emit(UiEvent.OnOrderClick(order))
                 }
             }
+
+        orderAdapter.onRemoveClickListener =
+            OrderHistoryAdapter.OnRemoveClickListener { order ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnOrderRemoveClick(order))
+                }
+            }
     }
 
     private fun initCreate() {
@@ -287,6 +295,7 @@ class OrderHistoryFragment: Fragment() {
     private fun handleAction(action: UiAction) {
         when (action) {
             is UiAction.NavigateToOrderDetails -> handleActionNavigateToOrderDetails(action)
+            is UiAction.OrderRemoveConfirm -> handleActionOrderRemoveConfirm(action)
             is UiAction.NavigateToOrderCreate -> handleActionNavigateToOrderCreate(action)
             is UiAction.NavigateToSettings -> handleActionNavigateToSettings()
             is UiAction.NavigateToCustomers -> handleActionNavigateToCustomers()
@@ -303,6 +312,19 @@ class OrderHistoryFragment: Fragment() {
                         order = action.order
                     )
             )
+    }
+
+    private fun handleActionOrderRemoveConfirm(action: UiAction.OrderRemoveConfirm) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.order_history_screen_remove_confirm_title))
+            .setMessage(getString(R.string.order_history_screen_remove_confirm, action.order.number))
+            .setNegativeButton(getString(R.string.order_history_screen_remove_confirm_negative), null)
+            .setPositiveButton(getString(R.string.order_history_screen_remove_confirm_positive)) { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnOrderRemoveConfirm(action.order))
+                }
+            }
+            .show()
     }
 
     private fun handleActionNavigateToOrderCreate(action: UiAction.NavigateToOrderCreate) {

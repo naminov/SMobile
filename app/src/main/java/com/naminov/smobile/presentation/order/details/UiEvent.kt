@@ -35,7 +35,9 @@ sealed class UiEvent {
     object OnCustomerClick : UiEvent()
     object OnProductAddClick : UiEvent()
     object OnSaveClick : UiEvent()
+    object OnRemoveClick : UiEvent()
+    object OnRemoveConfirm : UiEvent()
     object OnSettingsClick : UiEvent()
-    object OnConfirmExitWithoutSave : UiEvent()
     object OnExitClick : UiEvent()
+    object OnExitConfirmWithoutSave : UiEvent()
 }

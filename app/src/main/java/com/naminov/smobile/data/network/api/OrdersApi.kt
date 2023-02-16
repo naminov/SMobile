@@ -34,7 +34,7 @@ interface OrdersApi {
     @DELETE("/orders/{id}")
     suspend fun removeOrder(
         @Path("id") id: String
-    ): OrderDetailsDto
+    )
 
     @GET("/orders/new")
     suspend fun getOrderDetailsNew(

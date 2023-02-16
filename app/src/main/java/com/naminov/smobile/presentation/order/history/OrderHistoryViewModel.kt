@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.naminov.smobile.R
 import com.naminov.smobile.domain.usecase.customer.GetCustomerImgUseCase
 import com.naminov.smobile.domain.usecase.order.GetOrderHistoryUseCase
+import com.naminov.smobile.domain.usecase.order.RemoveOrderUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class OrderHistoryViewModel(
     private val getCustomerImgUseCase: GetCustomerImgUseCase,
-    private val getOrderHistoryUseCase: GetOrderHistoryUseCase
+    private val getOrderHistoryUseCase: GetOrderHistoryUseCase,
+    private val removeOrderUseCase: RemoveOrderUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -34,6 +36,8 @@ class OrderHistoryViewModel(
             is UiEvent.OnFilterNoDocumentsChange -> handleEventOnFilterNoDocumentsChange(uiEvent)
             is UiEvent.OnFilterNoPaymentChange -> handleEventOnFilterNoPaymentChange(uiEvent)
             is UiEvent.OnOrderClick -> handleEventOnOrderClick(uiEvent)
+            is UiEvent.OnOrderRemoveClick -> handleEventOnOrderRemoveClick(uiEvent)
+            is UiEvent.OnOrderRemoveConfirm -> handleEventOnOrderRemoveConfirm(uiEvent)
             UiEvent.OnLoad -> handleEventOnLoad()
             UiEvent.OnRefresh -> handleEventOnRefresh()
             UiEvent.OnCreateClick -> handleEventOnCreateClick()
@@ -100,6 +104,27 @@ class OrderHistoryViewModel(
     private fun handleEventOnOrderClick(uiEvent: UiEvent.OnOrderClick) {
         viewModelScope.launch {
             _action.emit(UiAction.NavigateToOrderDetails(uiEvent.order.id))
+        }
+    }
+
+    private fun handleEventOnOrderRemoveClick(uiEvent: UiEvent.OnOrderRemoveClick) {
+        viewModelScope.launch {
+            _action.emit(UiAction.OrderRemoveConfirm(uiEvent.order))
+        }
+    }
+
+    private fun handleEventOnOrderRemoveConfirm(uiEvent: UiEvent.OnOrderRemoveConfirm) {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                removeOrderUseCase.invoke(uiEvent.order.id)
+                handleEventOnRefresh()
+            } catch (e: Exception) {
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            } finally {
+                _state.value = _state.value.copy(loading = false)
+            }
         }
     }
 

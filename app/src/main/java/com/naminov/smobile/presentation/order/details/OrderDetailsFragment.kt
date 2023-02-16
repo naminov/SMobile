@@ -113,6 +113,12 @@ class OrderDetailsFragment : Fragment() {
 
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.remove -> {
+                    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                        viewModel.event.emit(UiEvent.OnRemoveClick)
+                    }
+                    true
+                }
                 R.id.settings -> {
                     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                         viewModel.event.emit(UiEvent.OnSettingsClick)
@@ -220,6 +226,9 @@ class OrderDetailsFragment : Fragment() {
             sumEt.editText?.setText(orderDetails.sum)
             productsAddBtn.isVisible = orderDetails.editable
             saveFab.isVisible = orderDetails.editable
+            val removeItem = appBar.menu
+                .findItem(R.id.remove)
+            removeItem?.isVisible = !orderDetails.new
         }
         productsAdapter.items = orderDetails.products
         productsAdapter.editable = orderDetails.editable
@@ -231,7 +240,8 @@ class OrderDetailsFragment : Fragment() {
             UiAction.NavigateToProducts -> handleActionNavigateToProducts()
             UiAction.NavigateToSettings -> handleActionNavigateToSettings()
             is UiAction.ShowMessage -> handleActionShowMessage(action)
-            UiAction.ConfirmExitWithoutSave -> handleActionConfirmExitWithoutSave()
+            UiAction.RemoveConfirm -> handleActionRemoveConfirm()
+            UiAction.ExitConfirmWithoutSave -> handleActionExitConfirmWithoutSave()
             UiAction.Exit -> handleActionExit()
         }
     }
@@ -286,14 +296,27 @@ class OrderDetailsFragment : Fragment() {
             .show()
     }
 
-    private fun handleActionConfirmExitWithoutSave() {
+    private fun handleActionRemoveConfirm() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.order_details_confirm_exit))
-            .setMessage(getString(R.string.order_details_confirm_exit_without_save))
-            .setNegativeButton(getString(R.string.order_details_confirm_exit_negative), null)
-            .setPositiveButton(getString(R.string.order_details_confirm_exit_positive)) { _, _ ->
+            .setTitle(getString(R.string.order_details_screen_remove_confirm_title))
+            .setMessage(getString(R.string.order_details_screen_remove_confirm))
+            .setNegativeButton(getString(R.string.order_details_screen_remove_confirm_negative), null)
+            .setPositiveButton(getString(R.string.order_details_screen_remove_confirm_positive)) { _, _ ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                    viewModel.event.emit(UiEvent.OnConfirmExitWithoutSave)
+                    viewModel.event.emit(UiEvent.OnRemoveConfirm)
+                }
+            }
+            .show()
+    }
+
+    private fun handleActionExitConfirmWithoutSave() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.order_details_screen_exit_confirm_title))
+            .setMessage(getString(R.string.order_details_screen_exit_confirm_without_save))
+            .setNegativeButton(getString(R.string.order_details_screen_exit_confirm_negative), null)
+            .setPositiveButton(getString(R.string.order_details_screen_exit_confirm_positive)) { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                    viewModel.event.emit(UiEvent.OnExitConfirmWithoutSave)
                 }
             }
             .show()

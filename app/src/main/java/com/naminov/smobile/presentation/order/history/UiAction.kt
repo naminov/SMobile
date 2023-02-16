@@ -1,6 +1,7 @@
 package com.naminov.smobile.presentation.order.history
 
 import androidx.annotation.StringRes
+import com.naminov.smobile.domain.model.OrderHistory
 
 sealed class UiAction {
     class ShowMessage(
@@ -9,6 +10,10 @@ sealed class UiAction {
 
     class NavigateToOrderDetails(
         val order: String
+    ) : UiAction()
+
+    class OrderRemoveConfirm(
+        val order: OrderHistory
     ) : UiAction()
 
     class NavigateToOrderCreate(
