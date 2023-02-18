@@ -27,8 +27,6 @@ class OrderDetailsProductsAdapter :
             result.dispatchUpdatesTo(this)
         }
 
-    var editable = false
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -110,12 +108,12 @@ class OrderDetailsProductsAdapter :
 
         fun bind(orderDetailsProduct: OrderDetailsProduct) {
             binding.run {
-                removeBtn.isVisible = editable
+                removeBtn.isVisible = orderDetailsProduct.editable
                 nameEt.editText?.setText(orderDetailsProduct.product.name)
                 numberEt.editText?.apply {
-                    isFocusable = editable
-                    isCursorVisible = editable
-                    setTextIsSelectable(editable)
+                    isFocusable = orderDetailsProduct.editable
+                    isCursorVisible = orderDetailsProduct.editable
+                    setTextIsSelectable(orderDetailsProduct.editable)
                     setText(orderDetailsProduct.number.toString())
                 }
                 priceEt.editText?.setText(orderDetailsProduct.price)

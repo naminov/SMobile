@@ -8,7 +8,8 @@ fun OrderDetailsProductDto.toDomain(): OrderDetailsProduct {
         product = product.toDomain(),
         price = price,
         number = number,
-        sum = sum
+        sum = sum,
+        editable = editable
     )
 }
 

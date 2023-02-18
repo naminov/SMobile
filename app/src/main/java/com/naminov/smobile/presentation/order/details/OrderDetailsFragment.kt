@@ -240,7 +240,6 @@ class OrderDetailsFragment : Fragment() {
             removeItem?.isVisible = !orderDetails.new
         }
         productsAdapter.items = orderDetails.products
-        productsAdapter.editable = orderDetails.editable
     }
 
     private fun handleAction(action: UiAction) {

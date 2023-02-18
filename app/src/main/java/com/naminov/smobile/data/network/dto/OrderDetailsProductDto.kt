@@ -10,5 +10,7 @@ data class OrderDetailsProductDto(
     @field:SerializedName("number")
     val number: Int,
     @field:SerializedName("sum")
-    val sum: String
+    val sum: String,
+    @field:SerializedName("editable")
+    val editable: Boolean
 )
