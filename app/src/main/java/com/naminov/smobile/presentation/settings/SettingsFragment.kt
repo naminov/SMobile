@@ -13,6 +13,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.SettingsFragmentBinding
+import com.naminov.smobile.presentation.extension.setNavigationOnSingleClickListener
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 import javax.inject.Inject
 
 class SettingsFragment: Fragment() {
@@ -23,6 +26,9 @@ class SettingsFragment: Fragment() {
     @Inject
     lateinit var viewModelFactory: SettingsViewModelFactory
     private val viewModel: SettingsViewModel by viewModels { viewModelFactory }
+
+    @Inject
+    lateinit var singleClickController: SingleClickController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +80,7 @@ class SettingsFragment: Fragment() {
     }
 
     private fun initAppBar() {
-        binding.appBar.setNavigationOnClickListener {
+        binding.appBar.setNavigationOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnExitClick)
             }
@@ -91,7 +97,7 @@ class SettingsFragment: Fragment() {
     }
 
     private fun initSave() {
-        binding.saveBtn.setOnClickListener {
+        binding.saveBtn.setOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnSaveClick)
             }

@@ -10,9 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.naminov.smobile.databinding.OrderDetailsProductItemBinding
 import com.naminov.smobile.domain.model.OrderDetailsProduct
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 
-class OrderDetailsProductsAdapter :
-    RecyclerView.Adapter<OrderDetailsProductsAdapter.OrderDetailsProductViewHolder>() {
+class OrderDetailsProductsAdapter(
+    private val singleClickController: SingleClickController
+) : RecyclerView.Adapter<OrderDetailsProductsAdapter.OrderDetailsProductViewHolder>() {
     var onProductNumberChangeListener: OnProductNumberChangeListener? = null
     var onProductRemoveListener: OnProductRemoveListener? = null
 
@@ -97,9 +100,9 @@ class OrderDetailsProductsAdapter :
                 }
             }
 
-            binding.removeBtn.setOnClickListener {
+            binding.removeBtn.setOnSingleClickListener(singleClickController) {
                 if (adapterPosition == RecyclerView.NO_POSITION) {
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
                 val product = items[adapterPosition]
                 onProductRemoveListener?.onProductRemove(product)

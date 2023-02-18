@@ -14,6 +14,8 @@ import com.naminov.smobile.R
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.LoginFragmentBinding
 import com.naminov.smobile.presentation.extension.hideKeyboard
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 import javax.inject.Inject
 
 class LoginFragment: Fragment() {
@@ -24,6 +26,9 @@ class LoginFragment: Fragment() {
     @Inject
     lateinit var viewModelFactory: LoginViewModelFactory
     private val viewModel: LoginViewModel by viewModels { viewModelFactory }
+
+    @Inject
+    lateinit var singleClickController: SingleClickController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +108,7 @@ class LoginFragment: Fragment() {
     }
 
     private fun initLogin() {
-        binding.loginBtn.setOnClickListener {
+        binding.loginBtn.setOnSingleClickListener(singleClickController) {
             hideKeyboard()
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnLoginClick)

@@ -10,8 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.naminov.smobile.R
 import com.naminov.smobile.databinding.OrderHistoryItemBinding
 import com.naminov.smobile.domain.model.OrderHistory
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 
-class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder>() {
+class OrderHistoryAdapter(
+    private val singleClickController: SingleClickController
+) : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder>() {
     var onItemClickListener: OnItemClickListener? = null
     var onCopyClickListener: OnCopyClickListener? = null
     var onRemoveClickListener: OnRemoveClickListener? = null
@@ -51,17 +55,17 @@ class OrderHistoryAdapter : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistor
         }
 
         private fun setListeners() {
-            binding.root.setOnClickListener {
+            binding.root.setOnSingleClickListener(singleClickController) {
                 if (adapterPosition == RecyclerView.NO_POSITION){
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
                 val item = items[adapterPosition]
                 onItemClickListener?.onItemClick(item)
             }
 
-            binding.moreBtn.setOnClickListener {
+            binding.moreBtn.setOnSingleClickListener(singleClickController) {
                 if (adapterPosition == RecyclerView.NO_POSITION){
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
                 val item = items[adapterPosition]
 

@@ -26,6 +26,9 @@ import com.naminov.smobile.domain.model.Product
 import com.naminov.smobile.presentation.adapter.OrderDetailsProductsAdapter
 import com.naminov.smobile.presentation.customer.CustomersFragment
 import com.naminov.smobile.presentation.extension.hideKeyboard
+import com.naminov.smobile.presentation.extension.setNavigationOnSingleClickListener
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 import com.naminov.smobile.presentation.product.ProductsFragment
 import javax.inject.Inject
 
@@ -40,7 +43,12 @@ class OrderDetailsFragment : Fragment() {
 
     private val args: OrderDetailsFragmentArgs by navArgs()
 
-    private val productsAdapter = OrderDetailsProductsAdapter()
+    @Inject
+    lateinit var singleClickController: SingleClickController
+
+    private val productsAdapter: OrderDetailsProductsAdapter by lazy {
+        OrderDetailsProductsAdapter(singleClickController)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,7 +113,7 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun initAppBar() {
-        binding.appBar.setNavigationOnClickListener {
+        binding.appBar.setNavigationOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnExitClick)
             }
@@ -137,8 +145,8 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun initCustomer() {
-        binding.customerEt.editText?.setOnClickListener {
-            if (!it.isClickable) return@setOnClickListener
+        binding.customerEt.editText?.setOnSingleClickListener(singleClickController) {
+            if (!it.isClickable) return@setOnSingleClickListener
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnCustomerClick)
             }
@@ -194,7 +202,7 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun initProductsAdd() {
-        binding.productsAddBtn.setOnClickListener {
+        binding.productsAddBtn.setOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnProductAddClick)
             }
@@ -203,7 +211,7 @@ class OrderDetailsFragment : Fragment() {
 
 
     private fun initSave() {
-        binding.saveFab.setOnClickListener {
+        binding.saveFab.setOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnSaveClick)
             }

@@ -20,6 +20,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.ProductsFragmentBinding
 import com.naminov.smobile.presentation.adapter.ProductsAdapter
+import com.naminov.smobile.presentation.extension.setNavigationOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 import javax.inject.Inject
 
 class ProductsFragment : BottomSheetDialogFragment() {
@@ -36,7 +38,12 @@ class ProductsFragment : BottomSheetDialogFragment() {
     lateinit var viewModelFactory: ProductsViewModelFactory
     private val viewModel: ProductsViewModel by viewModels { viewModelFactory }
 
-    private val productsAdapter = ProductsAdapter()
+    @Inject
+    lateinit var singleClickController: SingleClickController
+
+    private val productsAdapter: ProductsAdapter by lazy {
+        ProductsAdapter(singleClickController)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,7 +109,7 @@ class ProductsFragment : BottomSheetDialogFragment() {
     }
 
     private fun initAppBar() {
-        binding.appBar.setNavigationOnClickListener {
+        binding.appBar.setNavigationOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnExitClick)
             }

@@ -44,7 +44,8 @@ import javax.inject.Singleton
         HasOrderChangesUseCaseModule::class,
         SaveOrderUseCaseModule::class,
         RemoveOrderUseCaseModule::class,
-        GetProductsUseCaseModule::class
+        GetProductsUseCaseModule::class,
+        SingleClickControllerModule::class
     ]
 )
 @Singleton

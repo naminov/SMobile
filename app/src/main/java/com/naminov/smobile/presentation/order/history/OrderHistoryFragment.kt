@@ -25,7 +25,10 @@ import com.naminov.smobile.databinding.OrderHistoryFragmentBinding
 import com.naminov.smobile.domain.model.Customer
 import com.naminov.smobile.presentation.adapter.OrderHistoryAdapter
 import com.naminov.smobile.presentation.customer.CustomersFragment
+import com.naminov.smobile.presentation.extension.setOnCloseIconSingleClickListener
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
 import com.naminov.smobile.presentation.glide.GlideApp
+import com.naminov.smobile.presentation.listener.SingleClickController
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -38,7 +41,12 @@ class OrderHistoryFragment: Fragment() {
     lateinit var viewModelFactory: OrderHistoryViewModelFactory
     private val viewModel: OrderHistoryViewModel by viewModels { viewModelFactory }
 
-    private val orderAdapter = OrderHistoryAdapter()
+    @Inject
+    lateinit var singleClickController: SingleClickController
+
+    private val orderAdapter: OrderHistoryAdapter by lazy {
+        OrderHistoryAdapter(singleClickController)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,14 +189,14 @@ class OrderHistoryFragment: Fragment() {
     }
 
     private fun initFilterCustomer() {
-        binding.filterCustomerChip.setOnClickListener {
+        binding.filterCustomerChip.setOnSingleClickListener(singleClickController) {
             binding.filterCustomerChip.apply { isChecked = !isChecked }
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnFilterCustomerClick)
             }
         }
 
-        binding.filterCustomerChip.setOnCloseIconClickListener {
+        binding.filterCustomerChip.setOnCloseIconSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 if (binding.filterCustomerChip.isChecked) {
                     viewModel.event.emit(UiEvent.OnFilterCustomerClearClick)
@@ -253,7 +261,7 @@ class OrderHistoryFragment: Fragment() {
     }
 
     private fun initCreate() {
-        binding.createFab.setOnClickListener {
+        binding.createFab.setOnSingleClickListener(singleClickController) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnCreateClick)
             }

@@ -6,8 +6,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.naminov.smobile.databinding.ProductsItemBinding
 import com.naminov.smobile.domain.model.Product
+import com.naminov.smobile.presentation.extension.setOnSingleClickListener
+import com.naminov.smobile.presentation.listener.SingleClickController
 
-class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ProductViewHolder>() {
+class ProductsAdapter(
+    private val singleClickController: SingleClickController
+) : RecyclerView.Adapter<ProductsAdapter.ProductViewHolder>() {
     var onItemClickListener: OnItemClickListener? = null
 
     var items: List<Product> = listOf()
@@ -45,9 +49,9 @@ class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ProductViewHolder>(
         }
 
         private fun setListeners() {
-            binding.root.setOnClickListener {
+            binding.root.setOnSingleClickListener(singleClickController) {
                 if (adapterPosition == RecyclerView.NO_POSITION) {
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
                 val item = items[adapterPosition]
                 onItemClickListener?.onItemClick(item)
