@@ -7,7 +7,6 @@ import android.view.MenuItem.OnActionExpandListener
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.clearFragmentResultListener
@@ -190,7 +189,6 @@ class OrderHistoryFragment: Fragment() {
 
     private fun initFilterCustomer() {
         binding.filterCustomerChip.setOnSingleClickListener(singleClickController) {
-            binding.filterCustomerChip.apply { isChecked = !isChecked }
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.event.emit(UiEvent.OnFilterCustomerClick)
             }
@@ -203,6 +201,14 @@ class OrderHistoryFragment: Fragment() {
                 } else {
                     viewModel.event.emit(UiEvent.OnFilterCustomerClick)
                 }
+            }
+        }
+
+        binding.filterCustomerChip.setOnCheckedChangeListener { buttonView, isChecked ->
+            val state = viewModel.state.value
+            val filterCustomerEnabled = state.filter.customer != null
+            if (isChecked != filterCustomerEnabled) {
+                buttonView.isChecked = filterCustomerEnabled
             }
         }
     }
@@ -285,10 +291,10 @@ class OrderHistoryFragment: Fragment() {
             }
             if (filter.customer != null) {
                 text = filter.customer.name
-                closeIcon = ContextCompat.getDrawable(context, R.drawable.ic_close)
+                setCloseIconResource(R.drawable.ic_close)
             } else {
                 text = getString(R.string.order_history_screen_filter_customer)
-                closeIcon = ContextCompat.getDrawable(context, R.drawable.ic_arrow_down)
+                setCloseIconResource(R.drawable.ic_arrow_down)
             }
         }
 
