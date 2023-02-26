@@ -3,23 +3,23 @@ package com.naminov.smobile.data.repository
 import com.naminov.smobile.data.mapper.toDomain
 import com.naminov.smobile.data.mapper.toDto
 import com.naminov.smobile.data.network.api.OrdersApi
+import com.naminov.smobile.data.network.paging.OrdersPagingSource
 import com.naminov.smobile.domain.model.OrderDetails
 import com.naminov.smobile.domain.model.OrderEdit
-import com.naminov.smobile.domain.model.OrderHistory
 import com.naminov.smobile.domain.repository.OrdersRepository
 
 class OrdersRepositoryImpl(
-    private val ordersApi: OrdersApi
+    private val ordersApi: OrdersApi,
+    private val ordersPagingSourceFactory: OrdersPagingSource.Factory
 ) : OrdersRepository {
-    override suspend fun getOrderHistory(
+    override fun getOrderHistory(
         search: String?,
         customer: String?,
         payment: Boolean?,
         documents: Boolean?
-    ): List<OrderHistory> {
-        return ordersApi
-            .getOrderHistory(search?.ifEmpty { null }, customer, payment, documents)
-            .toDomain()
+    ): OrdersPagingSource {
+        return ordersPagingSourceFactory
+            .create(search, customer, payment, documents)
     }
 
     override suspend fun getOrderDetails(id: String): OrderDetails {

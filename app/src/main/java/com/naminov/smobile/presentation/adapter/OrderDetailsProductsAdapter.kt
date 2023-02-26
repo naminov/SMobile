@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -19,16 +20,7 @@ class OrderDetailsProductsAdapter(
     var onProductNumberChangeListener: OnProductNumberChangeListener? = null
     var onProductRemoveListener: OnProductRemoveListener? = null
 
-    var items: List<OrderDetailsProduct> = listOf()
-        set(value) {
-            val callback = DefaultDiffCallback(
-                oldList = field,
-                newList = value,
-            )
-            field = value
-            val result = DiffUtil.calculateDiff(callback)
-            result.dispatchUpdatesTo(this)
-        }
+    private val differ = AsyncListDiffer(this, DiffItemCallback())
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -41,12 +33,22 @@ class OrderDetailsProductsAdapter(
     }
 
     override fun onBindViewHolder(holder: OrderDetailsProductViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position) ?: return
         holder.bind(item)
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return differ.currentList.size
+    }
+
+    fun submitData(data: List<OrderDetailsProduct>) {
+        differ.submitList(data)
+    }
+
+    private fun getItem(position: Int): OrderDetailsProduct? {
+        val items = differ.currentList
+        if (position >= items.size) return null
+        return items[position]
     }
 
     inner class OrderDetailsProductViewHolder(
@@ -66,10 +68,10 @@ class OrderDetailsProductsAdapter(
                             setSelection(text.length)
                         }
                     } else {
-                        if (adapterPosition == RecyclerView.NO_POSITION) {
+                        if (bindingAdapterPosition == RecyclerView.NO_POSITION) {
                             return@setOnFocusChangeListener
                         }
-                        val product = items[adapterPosition]
+                        val product = getItem(bindingAdapterPosition) ?: return@setOnFocusChangeListener
                         val number = if (text.isNotEmpty()) {
                             text.toString().toInt()
                         } else {
@@ -101,10 +103,10 @@ class OrderDetailsProductsAdapter(
             }
 
             binding.removeBtn.setOnSingleClickListener(singleClickController) {
-                if (adapterPosition == RecyclerView.NO_POSITION) {
+                if (bindingAdapterPosition == RecyclerView.NO_POSITION) {
                     return@setOnSingleClickListener
                 }
-                val product = items[adapterPosition]
+                val product = getItem(bindingAdapterPosition) ?: return@setOnSingleClickListener
                 onProductRemoveListener?.onProductRemove(product)
             }
         }
@@ -131,5 +133,21 @@ class OrderDetailsProductsAdapter(
 
     fun interface OnProductRemoveListener {
         fun onProductRemove(product: OrderDetailsProduct)
+    }
+
+    class DiffItemCallback: DiffUtil.ItemCallback<OrderDetailsProduct>() {
+        override fun areItemsTheSame(
+            oldItem: OrderDetailsProduct,
+            newItem: OrderDetailsProduct
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(
+            oldItem: OrderDetailsProduct,
+            newItem: OrderDetailsProduct
+        ): Boolean {
+            return oldItem == newItem
+        }
     }
 }

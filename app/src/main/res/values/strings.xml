@@ -2,6 +2,7 @@
     <!--region common-->
     <string name="app_name">Sales Mobile</string>
     <string name="error">Ошибка</string>
+    <string name="error_loading">Ошибка загрузки</string>
     <!--endregion-->
 
     <!--region settings_screen-->

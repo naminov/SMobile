@@ -5,6 +5,7 @@ import com.naminov.smobile.domain.model.OrderDetailsProduct
 
 fun OrderDetailsProductDto.toDomain(): OrderDetailsProduct {
     return OrderDetailsProduct(
+        id = id,
         product = product.toDomain(),
         price = price,
         number = number,

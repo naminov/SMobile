@@ -247,7 +247,7 @@ class OrderDetailsFragment : Fragment() {
                 .findItem(R.id.remove)
             removeItem?.isVisible = !orderDetails.new
         }
-        productsAdapter.items = orderDetails.products
+        productsAdapter.submitData(orderDetails.products)
     }
 
     private fun handleAction(action: UiAction) {

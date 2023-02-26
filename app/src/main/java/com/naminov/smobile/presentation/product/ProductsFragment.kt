@@ -19,9 +19,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.ProductsFragmentBinding
+import com.naminov.smobile.presentation.adapter.LoadingAdapter
 import com.naminov.smobile.presentation.adapter.ProductsAdapter
 import com.naminov.smobile.presentation.extension.setNavigationOnSingleClickListener
 import com.naminov.smobile.presentation.listener.SingleClickController
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 class ProductsFragment : BottomSheetDialogFragment() {
@@ -135,7 +137,10 @@ class ProductsFragment : BottomSheetDialogFragment() {
         binding.productRv.apply {
             layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
             setHasFixedSize(true)
-            adapter = productsAdapter
+            adapter = productsAdapter.withLoadStateHeaderAndFooter(
+                header = LoadingAdapter(),
+                footer = LoadingAdapter()
+            )
         }
 
         productsAdapter.onItemClickListener =
@@ -169,7 +174,9 @@ class ProductsFragment : BottomSheetDialogFragment() {
 
     private fun handleState(state: UiState) {
         binding.refreshSrl.isRefreshing = state.loading
-        productsAdapter.items = state.products
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            state.products.collectLatest { productsAdapter.submitData(it) }
+        }
     }
 
     private fun handleAction(action: UiAction) {

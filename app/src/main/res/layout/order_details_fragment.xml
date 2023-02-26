@@ -274,6 +274,7 @@
             android:layout_height="match_parent"
             android:paddingBottom="100dp"
             android:clipToPadding="false"
+            android:overScrollMode="never"
             tools:listitem="@layout/order_details_product_item"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

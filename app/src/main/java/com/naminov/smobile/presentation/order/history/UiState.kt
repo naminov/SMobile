@@ -1,7 +1,10 @@
 package com.naminov.smobile.presentation.order.history
 
+import androidx.paging.PagingData
 import com.naminov.smobile.domain.model.OrderHistory
 import com.naminov.smobile.domain.model.OrderHistoryFilter
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 data class UiState(
     val filter: OrderHistoryFilter = OrderHistoryFilter(
@@ -11,6 +14,8 @@ data class UiState(
         noDocuments = false
     ),
     val customerImg: String = "",
-    val orders: List<OrderHistory> = listOf(),
+    val orders: Flow<PagingData<OrderHistory>> = flow {
+        PagingData.empty<OrderHistory>()
+    },
     val loading: Boolean = false
 )

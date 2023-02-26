@@ -22,12 +22,14 @@ import com.naminov.smobile.R
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.OrderHistoryFragmentBinding
 import com.naminov.smobile.domain.model.Customer
+import com.naminov.smobile.presentation.adapter.LoadingAdapter
 import com.naminov.smobile.presentation.adapter.OrderHistoryAdapter
 import com.naminov.smobile.presentation.customer.CustomersFragment
 import com.naminov.smobile.presentation.extension.setOnCloseIconSingleClickListener
 import com.naminov.smobile.presentation.extension.setOnSingleClickListener
 import com.naminov.smobile.presentation.glide.GlideApp
 import com.naminov.smobile.presentation.listener.SingleClickController
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -43,7 +45,7 @@ class OrderHistoryFragment: Fragment() {
     @Inject
     lateinit var singleClickController: SingleClickController
 
-    private val orderAdapter: OrderHistoryAdapter by lazy {
+    private val ordersAdapter: OrderHistoryAdapter by lazy {
         OrderHistoryAdapter(singleClickController)
     }
 
@@ -241,24 +243,27 @@ class OrderHistoryFragment: Fragment() {
         binding.orderRv.apply {
             layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
             setHasFixedSize(true)
-            adapter = orderAdapter
+            adapter = ordersAdapter.withLoadStateHeaderAndFooter(
+                header = LoadingAdapter(),
+                footer = LoadingAdapter()
+            )
         }
 
-        orderAdapter.onItemClickListener =
+        ordersAdapter.onItemClickListener =
             OrderHistoryAdapter.OnItemClickListener { order ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                     viewModel.event.emit(UiEvent.OnOrderClick(order))
                 }
             }
 
-        orderAdapter.onCopyClickListener =
+        ordersAdapter.onCopyClickListener =
             OrderHistoryAdapter.OnCopyClickListener { order ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                     viewModel.event.emit(UiEvent.OnOrderCopyClick(order))
                 }
             }
 
-        orderAdapter.onRemoveClickListener =
+        ordersAdapter.onRemoveClickListener =
             OrderHistoryAdapter.OnRemoveClickListener { order ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                     viewModel.event.emit(UiEvent.OnOrderRemoveClick(order))
@@ -310,7 +315,9 @@ class OrderHistoryFragment: Fragment() {
             }
         }
 
-        orderAdapter.items = state.orders
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            state.orders.collectLatest { ordersAdapter.submitData(it) }
+        }
     }
 
     private fun handleAction(action: UiAction) {

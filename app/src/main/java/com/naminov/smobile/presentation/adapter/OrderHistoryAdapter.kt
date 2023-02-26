@@ -5,6 +5,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.isInvisible
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.naminov.smobile.R
@@ -15,21 +16,12 @@ import com.naminov.smobile.presentation.listener.SingleClickController
 
 class OrderHistoryAdapter(
     private val singleClickController: SingleClickController
-) : RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder>() {
+) : PagingDataAdapter<OrderHistory, OrderHistoryAdapter.OrderHistoryViewHolder>(
+    DiffItemCallback()
+) {
     var onItemClickListener: OnItemClickListener? = null
     var onCopyClickListener: OnCopyClickListener? = null
     var onRemoveClickListener: OnRemoveClickListener? = null
-
-    var items: List<OrderHistory> = listOf()
-        set(value) {
-            val callback = DefaultDiffCallback(
-                oldList = field,
-                newList = value,
-            )
-            field = value
-            val result = DiffUtil.calculateDiff(callback)
-            result.dispatchUpdatesTo(this)
-        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderHistoryViewHolder {
         val binding = OrderHistoryItemBinding
@@ -39,12 +31,8 @@ class OrderHistoryAdapter(
     }
 
     override fun onBindViewHolder(holder: OrderHistoryViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position) ?: return
         holder.bind(item)
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
     }
 
     inner class OrderHistoryViewHolder(
@@ -56,18 +44,18 @@ class OrderHistoryAdapter(
 
         private fun setListeners() {
             binding.root.setOnSingleClickListener(singleClickController) {
-                if (adapterPosition == RecyclerView.NO_POSITION){
+                if (bindingAdapterPosition == RecyclerView.NO_POSITION){
                     return@setOnSingleClickListener
                 }
-                val item = items[adapterPosition]
+                val item = getItem(bindingAdapterPosition) ?: return@setOnSingleClickListener
                 onItemClickListener?.onItemClick(item)
             }
 
             binding.moreBtn.setOnSingleClickListener(singleClickController) {
-                if (adapterPosition == RecyclerView.NO_POSITION){
+                if (bindingAdapterPosition == RecyclerView.NO_POSITION){
                     return@setOnSingleClickListener
                 }
-                val item = items[adapterPosition]
+                val item = getItem(bindingAdapterPosition) ?: return@setOnSingleClickListener
 
                 val popup = PopupMenu(it.context, it)
                 popup.menuInflater.inflate(R.menu.order_history_more, popup.menu)
@@ -105,5 +93,15 @@ class OrderHistoryAdapter(
 
     fun interface OnRemoveClickListener {
         fun onRemoveClick(order: OrderHistory)
+    }
+
+    class DiffItemCallback: DiffUtil.ItemCallback<OrderHistory>() {
+        override fun areItemsTheSame(oldItem: OrderHistory, newItem: OrderHistory): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: OrderHistory, newItem: OrderHistory): Boolean {
+            return oldItem == newItem
+        }
     }
 }

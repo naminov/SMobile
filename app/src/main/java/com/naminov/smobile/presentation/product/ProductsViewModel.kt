@@ -2,6 +2,9 @@ package com.naminov.smobile.presentation.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.naminov.smobile.R
 import com.naminov.smobile.domain.usecase.product.GetProductsUseCase
 import kotlinx.coroutines.flow.*
@@ -55,7 +58,18 @@ class ProductsViewModel(
 
             try {
                 val search = state.value.search
-                val products = getProductsUseCase(search)
+
+                val products = Pager(
+                    PagingConfig(
+                        pageSize = 15,
+                        maxSize = 1000,
+                        enablePlaceholders = false
+                    )
+                ) {
+                    getProductsUseCase(search)
+                }.flow
+                    .cachedIn(viewModelScope)
+
                 _state.value = _state.value.copy(
                     products = products
                 )

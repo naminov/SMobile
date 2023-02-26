@@ -2,6 +2,7 @@ package com.naminov.smobile.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.naminov.smobile.databinding.ProductsItemBinding
@@ -11,19 +12,10 @@ import com.naminov.smobile.presentation.listener.SingleClickController
 
 class ProductsAdapter(
     private val singleClickController: SingleClickController
-) : RecyclerView.Adapter<ProductsAdapter.ProductViewHolder>() {
+) : PagingDataAdapter<Product, ProductsAdapter.ProductViewHolder>(
+    DiffItemCallback()
+) {
     var onItemClickListener: OnItemClickListener? = null
-
-    var items: List<Product> = listOf()
-        set(value) {
-            val callback = DefaultDiffCallback(
-                oldList = field,
-                newList = value,
-            )
-            field = value
-            val result = DiffUtil.calculateDiff(callback)
-            result.dispatchUpdatesTo(this)
-        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val binding = ProductsItemBinding
@@ -33,12 +25,8 @@ class ProductsAdapter(
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position) ?: return
         holder.bind(item)
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
     }
 
     inner class ProductViewHolder(
@@ -50,10 +38,10 @@ class ProductsAdapter(
 
         private fun setListeners() {
             binding.root.setOnSingleClickListener(singleClickController) {
-                if (adapterPosition == RecyclerView.NO_POSITION) {
+                if (bindingAdapterPosition == RecyclerView.NO_POSITION) {
                     return@setOnSingleClickListener
                 }
-                val item = items[adapterPosition]
+                val item = getItem(bindingAdapterPosition) ?: return@setOnSingleClickListener
                 onItemClickListener?.onItemClick(item)
             }
         }
@@ -65,5 +53,15 @@ class ProductsAdapter(
 
     fun interface OnItemClickListener {
         fun onItemClick(product: Product)
+    }
+
+    class DiffItemCallback: DiffUtil.ItemCallback<Product>() {
+        override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+            return oldItem == newItem
+        }
     }
 }

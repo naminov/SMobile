@@ -11,7 +11,9 @@ interface OrdersApi {
         @Query("search") search: String?,
         @Query("customer") customer: String?,
         @Query("payment") payment: Boolean?,
-        @Query("documents") documents: Boolean?
+        @Query("documents") documents: Boolean?,
+        @Query("page") page: Int,
+        @Query("page_size") pageSize: Int
     ): List<OrderHistoryDto>
 
     @GET("/orders/{id}")

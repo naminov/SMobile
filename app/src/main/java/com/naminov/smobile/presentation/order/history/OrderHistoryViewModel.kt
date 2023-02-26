@@ -2,6 +2,9 @@ package com.naminov.smobile.presentation.order.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.naminov.smobile.R
 import com.naminov.smobile.domain.usecase.customer.GetCustomerImgUseCase
 import com.naminov.smobile.domain.usecase.order.GetOrderHistoryUseCase
@@ -142,7 +145,18 @@ class OrderHistoryViewModel(
 
             try {
                 val filter = state.value.filter
-                val orders = getOrderHistoryUseCase(filter)
+
+                val orders = Pager(
+                    PagingConfig(
+                        pageSize = 10,
+                        maxSize = 1000,
+                        enablePlaceholders = false
+                    )
+                ) {
+                    getOrderHistoryUseCase(filter)
+                }.flow
+                    .cachedIn(viewModelScope)
+
                 _state.value = _state.value.copy(
                     orders = orders
                 )

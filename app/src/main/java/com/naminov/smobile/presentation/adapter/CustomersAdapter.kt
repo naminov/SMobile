@@ -2,6 +2,7 @@ package com.naminov.smobile.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.naminov.smobile.databinding.CustomersItemBinding
@@ -11,19 +12,10 @@ import com.naminov.smobile.presentation.listener.SingleClickController
 
 class CustomersAdapter(
     private val singleClickController: SingleClickController
-) : RecyclerView.Adapter<CustomersAdapter.CustomerViewHolder>() {
+) : PagingDataAdapter<Customer, CustomersAdapter.CustomerViewHolder>(
+    DiffItemCallback()
+) {
     var onItemClickListener: OnItemClickListener? = null
-
-    var items: List<Customer> = listOf()
-        set(value) {
-            val callback = DefaultDiffCallback(
-                oldList = field,
-                newList = value,
-            )
-            field = value
-            val result = DiffUtil.calculateDiff(callback)
-            result.dispatchUpdatesTo(this)
-        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomerViewHolder {
         val binding = CustomersItemBinding
@@ -33,12 +25,8 @@ class CustomersAdapter(
     }
 
     override fun onBindViewHolder(holder: CustomerViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position) ?: return
         holder.bind(item)
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
     }
 
     inner class CustomerViewHolder(
@@ -50,10 +38,10 @@ class CustomersAdapter(
 
         private fun setListeners() {
             binding.root.setOnSingleClickListener(singleClickController) {
-                if (adapterPosition == RecyclerView.NO_POSITION){
+                if (bindingAdapterPosition == RecyclerView.NO_POSITION){
                     return@setOnSingleClickListener
                 }
-                val item = items[adapterPosition]
+                val item = getItem(bindingAdapterPosition) ?: return@setOnSingleClickListener
                 onItemClickListener?.onItemClick(item)
             }
         }
@@ -65,5 +53,15 @@ class CustomersAdapter(
 
     fun interface OnItemClickListener {
         fun onItemClick(customer: Customer)
+    }
+
+    class DiffItemCallback: DiffUtil.ItemCallback<Customer>() {
+        override fun areItemsTheSame(oldItem: Customer, newItem: Customer): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Customer, newItem: Customer): Boolean {
+            return oldItem == newItem
+        }
     }
 }

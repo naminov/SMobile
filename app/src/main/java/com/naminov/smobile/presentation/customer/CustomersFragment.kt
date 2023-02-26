@@ -20,8 +20,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.naminov.smobile.app.App
 import com.naminov.smobile.databinding.CustomersFragmentBinding
 import com.naminov.smobile.presentation.adapter.CustomersAdapter
+import com.naminov.smobile.presentation.adapter.LoadingAdapter
 import com.naminov.smobile.presentation.extension.setNavigationOnSingleClickListener
 import com.naminov.smobile.presentation.listener.SingleClickController
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 class CustomersFragment: BottomSheetDialogFragment() {
@@ -135,7 +137,10 @@ class CustomersFragment: BottomSheetDialogFragment() {
         binding.customerRv.apply {
             layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
             setHasFixedSize(true)
-            adapter = customersAdapter
+            adapter = customersAdapter.withLoadStateHeaderAndFooter(
+                header = LoadingAdapter(),
+                footer = LoadingAdapter()
+            )
         }
 
         customersAdapter.onItemClickListener =
@@ -169,7 +174,9 @@ class CustomersFragment: BottomSheetDialogFragment() {
 
     private fun handleState(state: UiState) {
         binding.refreshSrl.isRefreshing = state.loading
-        customersAdapter.items = state.customers
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            state.customers.collectLatest { customersAdapter.submitData(it) }
+        }
     }
 
     private fun handleAction(action: UiAction) {

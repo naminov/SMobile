@@ -1,16 +1,17 @@
 package com.naminov.smobile.domain.repository
 
+import androidx.paging.PagingSource
 import com.naminov.smobile.domain.model.OrderDetails
 import com.naminov.smobile.domain.model.OrderEdit
 import com.naminov.smobile.domain.model.OrderHistory
 
 interface OrdersRepository {
-    suspend fun getOrderHistory(
+    fun getOrderHistory(
         search: String?,
         customer: String?,
         payment: Boolean?,
         documents: Boolean?
-    ): List<OrderHistory>
+    ): PagingSource<Int, OrderHistory>
     suspend fun getOrderDetails(id: String): OrderDetails
     suspend fun editOrder(id: String, orderEdit: OrderEdit): OrderDetails
     suspend fun saveOrder(id: String, orderEdit: OrderEdit): OrderDetails
