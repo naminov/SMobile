@@ -41,7 +41,7 @@ class OrderDetailsViewModel(
             is UiEvent.OnProductNumberChange -> handleEventOnProductNumberChange(uiEvent)
             is UiEvent.OnProductAdd -> handleEventOnProductAdd(uiEvent)
             is UiEvent.OnProductRemove -> handleEventOnProductRemove(uiEvent)
-            is UiEvent.OnLoad -> handleEventOnLoad(uiEvent)
+            is UiEvent.OnInitialization -> handleEventOnInitialization(uiEvent)
             UiEvent.OnCustomerClick -> handleEventOnCustomerClick()
             UiEvent.OnProductAddClick -> handleEventOnProductAddClick()
             UiEvent.OnSaveClick -> handleEventOnSaveClick()
@@ -161,8 +161,10 @@ class OrderDetailsViewModel(
         }
     }
 
-    private fun handleEventOnLoad(uiEvent: UiEvent.OnLoad) {
+    private fun handleEventOnInitialization(uiEvent: UiEvent.OnInitialization) {
         viewModelScope.launch {
+            if (_state.value.initialized) return@launch
+
             _state.value = _state.value.copy(loading = true)
 
             try {
@@ -179,7 +181,10 @@ class OrderDetailsViewModel(
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
             } finally {
-                _state.value = _state.value.copy(loading = false)
+                _state.value = _state.value.copy(
+                    initialized = true,
+                    loading = false
+                )
             }
         }
     }

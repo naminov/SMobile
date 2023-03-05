@@ -33,7 +33,7 @@ class LoginViewModel(
         when (uiEvent) {
             is UiEvent.OnUserNameChange -> handleEventOnUserNameChange(uiEvent)
             is UiEvent.OnPasswordChange -> handleEventOnPasswordChange(uiEvent)
-            UiEvent.OnLoad -> handleEventOnLoad()
+            UiEvent.OnInitialization -> handleEventOnInitialization()
             UiEvent.OnLoginClick -> handleEventOnLoginClick()
             UiEvent.OnSettingsClick -> handleEventOnSettingsClick()
         }
@@ -63,8 +63,10 @@ class LoginViewModel(
         }
     }
 
-    private fun handleEventOnLoad() {
+    private fun handleEventOnInitialization() {
         viewModelScope.launch {
+            if (_state.value.initialized) return@launch
+
             _state.value = _state.value.copy(loading = true)
 
             try {

@@ -58,10 +58,8 @@ class LoginFragment: Fragment() {
             viewModel.action.collect { handleAction(it) }
         }
 
-        if (savedInstanceState == null) {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnLoad)
-            }
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.event.emit(UiEvent.OnInitialization)
         }
     }
 

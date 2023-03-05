@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.naminov.smobile.R
+import com.naminov.smobile.domain.model.Product
 import com.naminov.smobile.domain.usecase.product.GetProductsUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,7 +34,8 @@ class ProductsViewModel(
         when (uiEvent) {
             is UiEvent.OnProductClick -> handleEventOnProductClick(uiEvent)
             is UiEvent.OnSearchChange -> handleEventOnSearchChange(uiEvent)
-            UiEvent.OnLoad -> handleEventOnLoad()
+            is UiEvent.OnLoadProducts -> handleEventOnLoadProducts(uiEvent)
+            UiEvent.OnInitialization -> handleEventOnInitialization()
             UiEvent.OnExitClick -> handleEventOnExitClick()
         }
     }
@@ -45,38 +48,51 @@ class ProductsViewModel(
     }
 
     private fun handleEventOnSearchChange(uiEvent: UiEvent.OnSearchChange) {
-        _state.value = _state.value.copy(
-            search = uiEvent.search
-        )
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                search = uiEvent.search,
+                loading = true
+            )
 
-        handleEventOnLoad()
+            try {
+                val search = state.value.search
+                val products = getProducts(search)
+
+                _state.value = _state.value.copy(products = products)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
+        }
     }
 
-    private fun handleEventOnLoad() {
+    private fun handleEventOnLoadProducts(uiEvent: UiEvent.OnLoadProducts) {
         viewModelScope.launch {
+            _state.value = _state.value.copy(
+                initialized = true,
+                loading = false
+            )
+
+            uiEvent.error?.let {
+                _action.emit(UiAction.ShowMessage(R.string.error_loading))
+            }
+        }
+    }
+
+    private fun handleEventOnInitialization() {
+        viewModelScope.launch {
+            if (_state.value.initialized) return@launch
+
             _state.value = _state.value.copy(loading = true)
 
             try {
                 val search = state.value.search
+                val products = getProducts(search)
 
-                val products = Pager(
-                    PagingConfig(
-                        pageSize = 15,
-                        maxSize = 1000,
-                        enablePlaceholders = false
-                    )
-                ) {
-                    getProductsUseCase(search)
-                }.flow
-                    .cachedIn(viewModelScope)
-
-                _state.value = _state.value.copy(
-                    products = products
-                )
+                _state.value = _state.value.copy(products = products)
             } catch (e: Exception) {
-                _action.emit(UiAction.ShowMessage(R.string.error))
-            } finally {
                 _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
             }
         }
     }
@@ -85,5 +101,18 @@ class ProductsViewModel(
         viewModelScope.launch {
             _action.emit(UiAction.Exit)
         }
+    }
+
+    private fun getProducts(search: String): Flow<PagingData<Product>> {
+        return Pager(
+            PagingConfig(
+                pageSize = 15,
+                maxSize = 1000,
+                enablePlaceholders = false
+            )
+        ) {
+            getProductsUseCase(search)
+        }.flow
+            .cachedIn(viewModelScope)
     }
 }

@@ -30,7 +30,7 @@ class SettingsViewModel(
     private fun handleEvent(uiEvent: UiEvent) {
         when (uiEvent) {
             is UiEvent.OnConnectionUrlChange -> handleEventOnConnectionUrlChange(uiEvent)
-            UiEvent.OnLoad -> handleEventOnLoad()
+            UiEvent.OnInitialization -> handleEventOnInitialization()
             UiEvent.OnSaveClick -> handleEventOnSaveClick()
             UiEvent.OnExitClick -> handleEventOnExitClick()
         }
@@ -47,8 +47,10 @@ class SettingsViewModel(
         }
     }
 
-    private fun handleEventOnLoad() {
+    private fun handleEventOnInitialization() {
         viewModelScope.launch {
+            if (_state.value.initialized) return@launch
+
             _state.value = _state.value.copy(loading = true)
 
             try {

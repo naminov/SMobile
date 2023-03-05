@@ -64,10 +64,8 @@ class SettingsFragment: Fragment() {
             }
         }
 
-        if (savedInstanceState == null) {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnLoad)
-            }
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.event.emit(UiEvent.OnInitialization)
         }
     }
 

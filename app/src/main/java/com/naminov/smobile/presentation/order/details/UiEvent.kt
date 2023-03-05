@@ -26,7 +26,7 @@ sealed class UiEvent {
         val product: OrderDetailsProduct
     ) : UiEvent()
 
-    class OnLoad(
+    class OnInitialization(
         val new: Boolean,
         val order: String,
         val customer: String

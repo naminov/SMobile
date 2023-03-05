@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.naminov.smobile.R
+import com.naminov.smobile.domain.model.OrderHistory
+import com.naminov.smobile.domain.model.OrderHistoryFilter
 import com.naminov.smobile.domain.usecase.customer.GetCustomerImgUseCase
 import com.naminov.smobile.domain.usecase.order.GetOrderHistoryUseCase
 import com.naminov.smobile.domain.usecase.order.RemoveOrderUseCase
@@ -42,7 +45,8 @@ class OrderHistoryViewModel(
             is UiEvent.OnOrderCopyClick -> handleEventOnOrderCopyClick(uiEvent)
             is UiEvent.OnOrderRemoveClick -> handleEventOnOrderRemoveClick(uiEvent)
             is UiEvent.OnOrderRemoveConfirm -> handleEventOnOrderRemoveConfirm(uiEvent)
-            UiEvent.OnLoad -> handleEventOnLoad()
+            is UiEvent.OnLoadOrders -> handleEventOnLoadOrders(uiEvent)
+            UiEvent.OnInitialization -> handleEventOnInitialization()
             UiEvent.OnRefresh -> handleEventOnRefresh()
             UiEvent.OnCreateClick -> handleEventOnCreateClick()
             UiEvent.OnSettingsClick -> handleEventOnSettingsClick()
@@ -53,55 +57,87 @@ class OrderHistoryViewModel(
 
     private fun handleEventOnSearchChange(uiEvent: UiEvent.OnSearchChange) {
         viewModelScope.launch {
-            val filter = state.value.filter
-            _state.value = _state.value.copy(
-                filter = filter.copy(
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val filter = state.value.filter.copy(
                     search = uiEvent.search
                 )
-            )
+                val orders = getOrders(filter)
 
-            handleEventOnLoad()
+                _state.value = _state.value.copy(
+                    filter = filter,
+                    orders = orders
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
         }
     }
 
     private fun handleEventOnFilterCustomerChange(uiEvent: UiEvent.OnFilterCustomerChange) {
         viewModelScope.launch {
-            val customerImg = getCustomerImgUseCase(uiEvent.customer)
-            val filter = state.value.filter
-            _state.value = _state.value.copy(
-                filter = filter.copy(
-                    customer = uiEvent.customer
-                ),
-                customerImg = customerImg
-            )
+            _state.value = _state.value.copy(loading = true)
 
-            handleEventOnLoad()
+            try {
+                val customerImg = getCustomerImgUseCase(uiEvent.customer)
+                val filter = state.value.filter.copy(
+                    customer = uiEvent.customer
+                )
+                val orders = getOrders(filter)
+
+                _state.value = _state.value.copy(
+                    filter = filter,
+                    customerImg = customerImg,
+                    orders = orders
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
         }
     }
 
     private fun handleEventOnFilterNoDocumentsChange(uiEvent: UiEvent.OnFilterNoDocumentsChange) {
         viewModelScope.launch {
-            val filter = state.value.filter
-            _state.value = _state.value.copy(
-                filter = filter.copy(
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val filter = state.value.filter.copy(
                     noDocuments = uiEvent.noDocuments
                 )
-            )
+                val orders = getOrders(filter)
 
-            handleEventOnLoad()
+                _state.value = _state.value.copy(
+                    filter = filter,
+                    orders = orders
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
         }
     }
 
     private fun handleEventOnFilterNoPaymentChange(uiEvent: UiEvent.OnFilterNoPaymentChange) {
         viewModelScope.launch {
-            val filter = state.value.filter
-            _state.value = _state.value.copy(
-                filter = filter.copy(
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val filter = state.value.filter.copy(
                     noPayment = uiEvent.noPayment
                 )
-            )
+                val orders = getOrders(filter)
 
-            handleEventOnLoad()
+                _state.value = _state.value.copy(
+                    filter = filter,
+                    orders = orders
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
         }
     }
 
@@ -130,7 +166,11 @@ class OrderHistoryViewModel(
 
             try {
                 removeOrderUseCase.invoke(uiEvent.order.id)
-                handleEventOnRefresh()
+
+                val filter = state.value.filter
+                val orders = getOrders(filter)
+
+                _state.value = _state.value.copy(orders = orders)
             } catch (e: Exception) {
                 _action.emit(UiAction.ShowMessage(R.string.error))
             } finally {
@@ -139,37 +179,51 @@ class OrderHistoryViewModel(
         }
     }
 
-    private fun handleEventOnLoad() {
+    private fun handleEventOnLoadOrders(uiEvent: UiEvent.OnLoadOrders) {
         viewModelScope.launch {
+            _state.value = _state.value.copy(
+                initialized = true,
+                loading = false
+            )
+
+            uiEvent.error?.let {
+                _action.emit(UiAction.ShowMessage(R.string.error_loading))
+            }
+        }
+    }
+
+    private fun handleEventOnInitialization() {
+        viewModelScope.launch {
+            if (_state.value.initialized) return@launch
+
             _state.value = _state.value.copy(loading = true)
 
             try {
                 val filter = state.value.filter
+                val orders = getOrders(filter)
 
-                val orders = Pager(
-                    PagingConfig(
-                        pageSize = 10,
-                        maxSize = 1000,
-                        enablePlaceholders = false
-                    )
-                ) {
-                    getOrderHistoryUseCase(filter)
-                }.flow
-                    .cachedIn(viewModelScope)
-
-                _state.value = _state.value.copy(
-                    orders = orders
-                )
+                _state.value = _state.value.copy(orders = orders)
             } catch (e: Exception) {
-                _action.emit(UiAction.ShowMessage(R.string.error))
-            } finally {
                 _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
             }
         }
     }
 
     private fun handleEventOnRefresh() {
-        handleEventOnLoad()
+        viewModelScope.launch {
+            _state.value = _state.value.copy(loading = true)
+
+            try {
+                val filter = state.value.filter
+                val orders = getOrders(filter)
+
+                _state.value = _state.value.copy(orders = orders)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
+        }
     }
 
     private fun handleEventOnCreateClick() {
@@ -193,15 +247,36 @@ class OrderHistoryViewModel(
 
     private fun handleEventOnFilterCustomerClearClick() {
         viewModelScope.launch {
-            val filter = state.value.filter
-            _state.value = _state.value.copy(
-                filter = filter.copy(
-                    customer = null
-                ),
-                customerImg = ""
-            )
+            _state.value = _state.value.copy(loading = true)
 
-            handleEventOnLoad()
+            try {
+                val filter = state.value.filter.copy(
+                    customer = null
+                )
+                val orders = getOrders(filter)
+
+                _state.value = _state.value.copy(
+                    filter = filter,
+                    customerImg = "",
+                    orders = orders
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
         }
+    }
+
+    private fun getOrders(filter: OrderHistoryFilter): Flow<PagingData<OrderHistory>> {
+        return Pager(
+            PagingConfig(
+                pageSize = 10,
+                maxSize = 1000,
+                enablePlaceholders = false
+            )
+        ) {
+            getOrderHistoryUseCase(filter)
+        }.flow
+            .cachedIn(viewModelScope)
     }
 }

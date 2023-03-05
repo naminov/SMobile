@@ -5,7 +5,7 @@ sealed class UiEvent {
         val connectionUrl: String
     ) : UiEvent()
 
-    object OnLoad : UiEvent()
+    object OnInitialization : UiEvent()
     object OnSaveClick : UiEvent()
     object OnExitClick : UiEvent()
 }

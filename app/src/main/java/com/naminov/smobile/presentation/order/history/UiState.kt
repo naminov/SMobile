@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 data class UiState(
+    val initialized: Boolean = false,
     val filter: OrderHistoryFilter = OrderHistoryFilter(
         search = "",
         customer = null,

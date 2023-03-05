@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.naminov.smobile.R
+import com.naminov.smobile.domain.model.Customer
 import com.naminov.smobile.domain.usecase.customer.GetCustomersUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,7 +34,8 @@ class CustomersViewModel(
         when (uiEvent) {
             is UiEvent.OnCustomerClick -> handleEventOnCustomerClick(uiEvent)
             is UiEvent.OnSearchChange -> handleEventOnSearchChange(uiEvent)
-            UiEvent.OnLoad -> handleEventOnLoad()
+            is UiEvent.OnLoadCustomers -> handleEventOnLoadCustomers(uiEvent)
+            UiEvent.OnInitialization -> handleEventOnInitialization()
             UiEvent.OnExitClick -> handleEventOnExitClick()
         }
     }
@@ -45,38 +48,51 @@ class CustomersViewModel(
     }
 
     private fun handleEventOnSearchChange(uiEvent: UiEvent.OnSearchChange) {
-        _state.value = _state.value.copy(
-            search = uiEvent.search
-        )
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                search = uiEvent.search,
+                loading = true
+            )
 
-        handleEventOnLoad()
+            try {
+                val search = state.value.search
+                val customers = getCustomers(search)
+
+                _state.value = _state.value.copy(customers = customers)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
+            }
+        }
     }
 
-    private fun handleEventOnLoad() {
+    private fun handleEventOnLoadCustomers(uiEvent: UiEvent.OnLoadCustomers) {
         viewModelScope.launch {
+            _state.value = _state.value.copy(
+                initialized = true,
+                loading = false
+            )
+
+            uiEvent.error?.let {
+                _action.emit(UiAction.ShowMessage(R.string.error_loading))
+            }
+        }
+    }
+
+    private fun handleEventOnInitialization() {
+        viewModelScope.launch {
+            if (_state.value.initialized) return@launch
+
             _state.value = _state.value.copy(loading = true)
 
             try {
                 val search = state.value.search
+                val customers = getCustomers(search)
 
-                val customers = Pager(
-                    PagingConfig(
-                        pageSize = 15,
-                        maxSize = 1000,
-                        enablePlaceholders = false
-                    )
-                ) {
-                    getCustomersUseCase(search)
-                }.flow
-                    .cachedIn(viewModelScope)
-
-                _state.value = _state.value.copy(
-                    customers = customers
-                )
+                _state.value = _state.value.copy(customers = customers)
             } catch (e: Exception) {
-                _action.emit(UiAction.ShowMessage(R.string.error))
-            } finally {
                 _state.value = _state.value.copy(loading = false)
+                _action.emit(UiAction.ShowMessage(R.string.error))
             }
         }
     }
@@ -85,5 +101,18 @@ class CustomersViewModel(
         viewModelScope.launch {
             _action.emit(UiAction.Exit)
         }
+    }
+
+    private fun getCustomers(search: String): Flow<PagingData<Customer>> {
+        return Pager(
+            PagingConfig(
+                pageSize = 15,
+                maxSize = 1000,
+                enablePlaceholders = false
+            )
+        ) {
+            getCustomersUseCase(search)
+        }.flow
+            .cachedIn(viewModelScope)
     }
 }

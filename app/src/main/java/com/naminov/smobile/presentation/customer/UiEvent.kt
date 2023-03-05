@@ -11,6 +11,10 @@ sealed class UiEvent {
         val customer: Customer
     ) : UiEvent()
 
-    object OnLoad : UiEvent()
+    class OnLoadCustomers(
+        val error: Throwable? = null
+    ) : UiEvent()
+
+    object OnInitialization : UiEvent()
     object OnExitClick : UiEvent()
 }

@@ -36,7 +36,11 @@ sealed class UiEvent {
         val order: OrderHistory
     ) : UiEvent()
 
-    object OnLoad : UiEvent()
+    class OnLoadOrders(
+        val error: Throwable? = null
+    ) : UiEvent()
+
+    object OnInitialization : UiEvent()
     object OnRefresh : UiEvent()
     object OnCreateClick : UiEvent()
     object OnSettingsClick : UiEvent()

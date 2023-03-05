@@ -8,12 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -77,10 +80,8 @@ class OrderHistoryFragment: Fragment() {
             viewModel.action.collect { handleAction(it) }
         }
 
-        if (savedInstanceState == null) {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnLoad)
-            }
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.event.emit(UiEvent.OnInitialization)
         }
     }
 
@@ -249,6 +250,17 @@ class OrderHistoryFragment: Fragment() {
             )
         }
 
+        ordersAdapter.addLoadStateListener { state: CombinedLoadStates ->
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                if (state.refresh is LoadState.NotLoading) {
+                    viewModel.event.emit(UiEvent.OnLoadOrders())
+                } else if (state.refresh is LoadState.Error) {
+                    val error = (state.refresh as LoadState.Error).error
+                    viewModel.event.emit(UiEvent.OnLoadOrders(error))
+                }
+            }
+        }
+
         ordersAdapter.onItemClickListener =
             OrderHistoryAdapter.OnItemClickListener { order ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -280,38 +292,52 @@ class OrderHistoryFragment: Fragment() {
     }
 
     private fun handleState(state: UiState) {
-        binding.refreshSrl.isRefreshing = state.loading
-
-        GlideApp
-            .with(this)
-            .load(state.customerImg)
-            .into(binding.customerIv)
-
-        val filter = state.filter
-
-        binding.filterCustomerChip.apply {
-            val filterCustomerEnabled = filter.customer != null
-            if (isChecked != filterCustomerEnabled) {
-                isChecked = filterCustomerEnabled
+        binding.run {
+            shimmerSfl.apply {
+                isVisible = !state.initialized
+                if (!state.initialized) {
+                    startShimmer()
+                } else {
+                    stopShimmer()
+                }
             }
-            if (filter.customer != null) {
-                text = filter.customer.name
-                setCloseIconResource(R.drawable.ic_close)
-            } else {
-                text = getString(R.string.order_history_screen_filter_customer)
-                setCloseIconResource(R.drawable.ic_arrow_down)
-            }
-        }
 
-        binding.filterNoPaymentChip.apply {
-            if (isChecked != filter.noPayment) {
-                isChecked = filter.noPayment
+            refreshSrl.apply {
+                isVisible = state.initialized
+                isRefreshing = state.initialized && state.loading
             }
-        }
 
-        binding.filterNoDocumentsChip.apply {
-            if (isChecked != filter.noDocuments) {
-                isChecked = filter.noDocuments
+            GlideApp
+                .with(this@OrderHistoryFragment)
+                .load(state.customerImg)
+                .into(customerIv)
+
+            val filter = state.filter
+
+            filterCustomerChip.apply {
+                val filterCustomerEnabled = filter.customer != null
+                if (isChecked != filterCustomerEnabled) {
+                    isChecked = filterCustomerEnabled
+                }
+                if (filter.customer != null) {
+                    text = filter.customer.name
+                    setCloseIconResource(R.drawable.ic_close)
+                } else {
+                    text = getString(R.string.order_history_screen_filter_customer)
+                    setCloseIconResource(R.drawable.ic_arrow_down)
+                }
+            }
+
+            filterNoPaymentChip.apply {
+                if (isChecked != filter.noPayment) {
+                    isChecked = filter.noPayment
+                }
+            }
+
+            filterNoDocumentsChip.apply {
+                if (isChecked != filter.noDocuments) {
+                    isChecked = filter.noDocuments
+                }
             }
         }
 

@@ -3,6 +3,7 @@ package com.naminov.smobile.presentation.order.details
 import com.naminov.smobile.domain.model.*
 
 data class UiState(
+    val initialized: Boolean = false,
     val orderDetailsOrig: OrderDetails = OrderDetails(
         id = "",
         number = "",

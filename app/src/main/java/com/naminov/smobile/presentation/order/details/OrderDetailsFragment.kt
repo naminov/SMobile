@@ -84,15 +84,13 @@ class OrderDetailsFragment : Fragment() {
             }
         }
 
-        if (savedInstanceState == null) {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                val event = UiEvent.OnLoad(
-                    args.new,
-                    args.order,
-                    args.customer
-                )
-                viewModel.event.emit(event)
-            }
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            val event = UiEvent.OnInitialization(
+                args.new,
+                args.order,
+                args.customer
+            )
+            viewModel.event.emit(event)
         }
     }
 

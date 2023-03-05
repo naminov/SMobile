@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -76,9 +76,9 @@ class OrderHistoryAdapter(
                 dateTv.text = order.date
                 customerTv.text = order.customer
                 sumTv.text = order.sum
-                completedIv.isInvisible = !order.completed
-                noPaymentIv.isInvisible = order.payment
-                noDocumentsIv.isInvisible = order.documents
+                completedIv.isVisible = order.completed
+                noPaymentIv.isVisible = !order.payment
+                noDocumentsIv.isVisible = !order.documents
             }
         }
     }

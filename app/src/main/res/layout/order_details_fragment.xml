@@ -158,15 +158,17 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                tools:ignore="MissingConstraints">
 
-                <ImageView
-                    android:id="@+id/completed_iv"
+                <androidx.constraintlayout.helper.widget.Flow
+                    android:id="@+id/icons_flw"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:src="@drawable/ic_assignment_turned"
-                    app:tint="@android:color/holo_green_dark"
+                    android:layout_height="24dp"
+                    android:layout_margin="12dp"
+                    android:orientation="horizontal"
+                    app:constraint_referenced_ids="completed_iv, no_payment_iv, no_documents_iv"
+                    app:flow_horizontalGap="12dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -174,30 +176,25 @@
                     app:layout_constraintHorizontal_bias="0"/>
 
                 <ImageView
+                    android:id="@+id/completed_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_assignment_turned"
+                    app:tint="@android:color/holo_green_dark" />
+
+                <ImageView
                     android:id="@+id/no_payment_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:src="@drawable/ic_credit_card_off"
-                    app:tint="@android:color/holo_red_dark"
-                    app:layout_constraintStart_toEndOf="@id/completed_iv"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintHorizontal_bias="0"/>
+                    app:tint="@android:color/holo_red_dark" />
 
                 <ImageView
                     android:id="@+id/no_documents_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:src="@drawable/ic_content_paste_off"
-                    app:tint="@android:color/holo_red_dark"
-                    app:layout_constraintStart_toEndOf="@id/no_payment_iv"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintHorizontal_bias="0"/>
+                    app:tint="@android:color/holo_red_dark" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/sum_et"
@@ -206,7 +203,7 @@
                     android:layout_marginTop="4dp"
                     app:expandedHintEnabled="false"
                     android:hint="@string/order_details_screen_sum"
-                    app:layout_constraintStart_toEndOf="@id/no_documents_iv"
+                    app:layout_constraintStart_toEndOf="@id/icons_flw"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">

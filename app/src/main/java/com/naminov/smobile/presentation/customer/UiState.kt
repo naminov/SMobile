@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 data class UiState(
+    val initialized: Boolean = false,
     val search: String = "",
     val customers: Flow<PagingData<Customer>> = flow {
         PagingData.empty<Customer>()

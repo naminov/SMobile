@@ -11,6 +11,10 @@ sealed class UiEvent {
         val product: Product
     ) : UiEvent()
 
-    object OnLoad : UiEvent()
+    class OnLoadProducts(
+        val error: Throwable? = null
+    ) : UiEvent()
+
+    object OnInitialization : UiEvent()
     object OnExitClick : UiEvent()
 }

@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -83,10 +86,8 @@ class CustomersFragment: BottomSheetDialogFragment() {
             }
         }
 
-        if (savedInstanceState == null) {
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.event.emit(UiEvent.OnLoad)
-            }
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.event.emit(UiEvent.OnInitialization)
         }
     }
 
@@ -143,6 +144,17 @@ class CustomersFragment: BottomSheetDialogFragment() {
             )
         }
 
+        customersAdapter.addLoadStateListener { state: CombinedLoadStates ->
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                if (state.refresh is LoadState.NotLoading) {
+                    viewModel.event.emit(UiEvent.OnLoadCustomers())
+                } else if (state.refresh is LoadState.Error) {
+                    val error = (state.refresh as LoadState.Error).error
+                    viewModel.event.emit(UiEvent.OnLoadCustomers(error))
+                }
+            }
+        }
+
         customersAdapter.onItemClickListener =
             CustomersAdapter.OnItemClickListener { customer ->
                 viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -173,7 +185,22 @@ class CustomersFragment: BottomSheetDialogFragment() {
     }
 
     private fun handleState(state: UiState) {
-        binding.refreshSrl.isRefreshing = state.loading
+        binding.run {
+            shimmerSfl.apply {
+                isVisible = !state.initialized
+                if (!state.initialized) {
+                    startShimmer()
+                } else {
+                    stopShimmer()
+                }
+            }
+
+            refreshSrl.apply {
+                isVisible = state.initialized
+                isRefreshing = state.initialized && state.loading
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             state.customers.collectLatest { customersAdapter.submitData(it) }
         }
